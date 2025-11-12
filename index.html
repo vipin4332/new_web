@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="t1">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Tenx — Our Toppers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* =============================
+       DESIGN SYSTEM & THEMES
+    ==============================*/
+    
+    :root {
+      --radius-sm: 10px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --shadow-sm: 0 8px 24px rgba(0,0,0,.08);
+      --shadow-md: 0 16px 40px rgba(0,0,0,.12);
+      --shadow-lg: 0 30px 80px rgba(0,0,0,.18);
+      --glass: rgba(255,255,255,.08);
+      --speed: .5s;
+      --easing: cubic-bezier(.2,.8,.2,1);
+      --maxw: 1200px;
+
+      /* Typography */
+      --font-head: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, sans-serif;
+      --font-body: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, sans-serif;
+    }
+
+    /* -------- THEME 1: Premium Blue–Gold -------- */
+    [data-theme="t1"]{
+      --bg: #0a1324;
+      --bg-2: #0f1a33;
+      --text: #e9eefb;
+      --muted: #a7b2cc;
+      --primary: #287bff;
+      --primary-2: #0d46ff;
+      --accent: #f0c674; /* gold */
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --hero-grad: radial-gradient(1000px 600px at 20% -10%, rgba(58,130,255,.35), transparent 60%),
+                   radial-gradient(800px 500px at 85% 20%, rgba(240,198,116,.25), transparent 60%),
+                   linear-gradient(180deg, #0a1324 0%, #0b1321 100%);
+    }
+
+    /* -------- THEME 2: Neon Tech (Dark) -------- */
+    [data-theme="t2"]{
+      --bg: #0a0d12;
+      --bg-2: #0e121a;
+      --text: #e7f1ff;
+      --muted: #9fb1c8;
+      --primary: #5ad6ff; /* cyan */
+      --primary-2: #ac6aff; /* purple */
+      --accent: #00ffd1;
+      --card: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.10);
+      --hero-grad: radial-gradient(1200px 700px at 10% -10%, rgba(90,214,255,.25), transparent 60%),
+                   radial-gradient(900px 600px at 90% 10%, rgba(172,106,255,.25), transparent 60%),
+                   linear-gradient(180deg, #0a0d12 0%, #0a0e15 100%);
+    }
+
+    /* -------- THEME 3: Clean Minimal (Light) -------- */
+    [data-theme="t3"]{
+      --bg: #f7f8fc;
+      --bg-2: #ffffff;
+      --text: #1b2230;
+      --muted: #505c74;
+      --primary: #1d7bff;
+      --primary-2: #1154d6;
+      --accent: #111111;
+      --card: #ffffff;
+      --border: rgba(10,20,40,0.10);
+      --hero-grad: radial-gradient(1000px 600px at 10% -10%, rgba(29,123,255,.15), transparent 60%),
+                   radial-gradient(900px 600px at 95% 5%, rgba(17,84,214,.15), transparent 60%),
+                   linear-gradient(180deg, #f8faff 0%, #f7f8fc 100%);
+    }
+
+    /* -------- THEME 4: Bold Gradient (Energetic) -------- */
+    [data-theme="t4"]{
+      --bg: #0e0a12;
+      --bg-2: #120d16;
+      --text: #faf6ff;
+      --muted: #cbb8e8;
+      --primary: #ff7a59; /* orange */
+      --primary-2: #ff2e7e; /* pink */
+      --accent: #ffd166; /* warm yellow */
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --hero-grad: radial-gradient(1100px 650px at 10% -10%, rgba(255,122,89,.28), transparent 60%),
+                   radial-gradient(1000px 650px at 85% 0%, rgba(255,46,126,.28), transparent 60%),
+                   linear-gradient(180deg, #0e0a12 0%, #100a14 100%);
+    }
+
+    /* =============================
+       BASE
+    ==============================*/
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    img{max-width:100%; display:block}
+    a{color:inherit; text-decoration:none}
+
+    .container{
+      width:100%;
+      max-width: var(--maxw);
+      margin-inline:auto;
+      padding-inline: 24px;
+    }
+
+    /* =============================
+       NAV
+    ==============================*/
+    .header{
+      position: sticky; top:0; z-index: 1000;
+      backdrop-filter: blur(10px);
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav{
+      height: 76px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; font-family: var(--font-head);
+      font-weight:800; letter-spacing:.3px; font-size: 1.25rem;
+    }
+    .brand svg{filter: drop-shadow(0 6px 16px rgba(0,0,0,.25))}
+    .nav-list{
+      display:flex; gap:26px; align-items:center;
+    }
+    .nav-link{
+      color: var(--muted); font-weight:500; transition: color var(--speed) var(--easing);
+    }
+    .nav-link:hover{color: var(--text)}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+      padding: 10px 18px; border-radius: var(--radius-lg);
+      font-weight: 600; cursor:pointer; transition: transform .25s var(--easing), box-shadow .25s var(--easing), background .25s var(--easing), color .25s var(--easing);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--bg-2) 70%, transparent), color-mix(in oklab, var(--bg) 80%, transparent));
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+      font-family: inherit;
+      font-size: inherit;
+      text-decoration: none;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md)}
+    .btn:disabled{
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    .btn-primary{
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+      color: #fff;
+      box-shadow: 0 10px 30px color-mix(in oklab, var(--primary) 35%, transparent);
+    }
+    .btn-ghost{ background: transparent; border-color: var(--border); color: var(--muted)}
+    .btn-ghost:hover{ color: var(--text); border-color: color-mix(in oklab, var(--text) 25%, var(--border))}
+
+    /* Theme switcher */
+    .theme-switch{
+      display:flex; gap:10px; align-items:center;
+      background: color-mix(in oklab, var(--bg-2) 60%, transparent);
+      border: 1px solid var(--border);
+      padding: 6px; border-radius: 999px;
+    }
+    .chip{
+      border:none; background: transparent; color: var(--muted);
+      padding: 8px 14px; border-radius: 999px; font-weight:600; cursor:pointer;
+      transition: background .2s var(--easing), color .2s var(--easing), transform .2s var(--easing);
+    }
+    .chip.active, .chip:hover{
+      background: color-mix(in oklab, var(--primary) 18%, var(--bg-2));
+      color: #fff; transform: translateY(-1px);
+    }
+
+    /* =============================
+       HERO
+    ==============================*/
+    .hero{
+      position: relative;
+      background: var(--hero-grad);
+      overflow: hidden;
+      padding: 96px 0 72px;
+      border-bottom: 1px solid var(--border);
+      
+    }
+    .hero-grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:700; letter-spacing:.6px; font-family: var(--font-head); font-size:.9rem;
+      color: var(--accent); text-transform: uppercase;
+    }
+    .hero h1{
+      font-family: var(--font-head);
+      font-weight: 800; line-height:1.12; letter-spacing: -0.5px;
+      font-size: clamp(2.2rem, 3.6vw + .8rem, 3.8rem);
+      margin: 10px 0 14px;
+      text-wrap: balance;
+    }
+    .sub{
+      color: var(--muted); font-size: clamp(1rem, .7vw + .8rem, 1.15rem);
+      max-width: 56ch;
+    }
+    .hero-cta{ display:flex; gap:12px; margin-top: 24px; flex-wrap: wrap}
+
+    /* Floating shapes (subtle) */
+    .blob, .ring{
+      position:absolute; pointer-events:none; filter: blur(20px); opacity:.35; mix-blend-mode: screen;
+      animation: floaty 12s var(--easing) infinite alternate;
+    }
+    .blob{ width: 420px; height: 420px; background: radial-gradient(circle at 30% 30%, var(--primary), transparent 60%)}
+    .blob.one{ top:-80px; left:-80px; animation-delay: 0s}
+    .blob.two{ bottom:-120px; right:-120px; animation-delay: .6s}
+    .ring{
+      width: 360px; height: 360px; border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--primary-2) 75%, transparent) 0%, transparent 60%);
+      top: -60px; right: 20%;
+      animation-delay: .3s
+    }
+    @keyframes floaty{
+      to{ transform: translateY(20px) translateX(10px) scale(1.03); opacity:.5}
+    }
+
+    /* =============================
+       FEATURE / SERVICES
+    ==============================*/
+    section{ padding: 84px 0}
+    .section-title{
+      font-family: var(--font-head); font-size: clamp(1.6rem, 1.2vw + 1rem, 2.2rem);
+      margin-bottom: 14px; letter-spacing: -.2px;
+    }
+    .section-sub{ color: var(--muted); margin-bottom: 34px}
+
+    .cards{
+      display:grid; gap: 22px;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+    .card{
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--card) 100%, transparent), color-mix(in oklab, var(--bg-2) 85%, transparent));
+      border-radius: var(--radius-lg);
+      padding: 26px 22px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .35s var(--easing), box-shadow .35s var(--easing), border-color .35s var(--easing);
+      position: relative; overflow:hidden;
+    }
+    .card:hover{
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: color-mix(in oklab, var(--primary) 25%, var(--border));
+    }
+    .card h3{
+      font-family: var(--font-head); font-size: 1.15rem; margin: 4px 0 8px;
+    }
+    .card p{ color: var(--muted) }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px; font-size:.82rem; color: var(--muted);
+      background: color-mix(in oklab, var(--bg) 80%, var(--card)); padding:6px 10px; border-radius: 999px; border:1px solid var(--border)
+    }
+
+    /* =============================
+       WHY US (split grid)
+    ==============================*/
+    .split{
+      display:grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items:center;
+    }
+    .media{
+      border-radius: var(--radius-lg); overflow:hidden; border:1px solid var(--border);
+      box-shadow: var(--shadow-md)
+    }
+    .media img{ width:100%; height:auto; display:block}
+    .ticks{ margin-top: 10px}
+    .ticks li{ color: var(--muted); margin: 10px 0; list-style: none; display:flex; gap:10px; align-items:flex-start}
+    .ticks li strong{ color: var(--text)}
+    .tick{
+      margin-top: 3px; width: 18px; height: 18px; border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 6px 20px color-mix(in oklab, var(--primary) 35%, transparent);
+      flex: 0 0 18px;
+      position: relative;
+    }
+    .tick:after{
+      content:""; position:absolute; inset: 4px 3px auto auto;
+      width: 6px; height: 10px; border: 2px solid #fff; border-left: 0; border-top: 0; transform: rotate(40deg)
+    }
+
+    /* =============================
+       STATS (strip)
+    ==============================*/
+    .stats{
+      background: linear-gradient(90deg, color-mix(in oklab, var(--primary) 35%, var(--bg-2)), color-mix(in oklab, var(--primary-2) 35%, var(--bg-2)));
+      border-block: 1px solid var(--border);
+      color: #fff;
+    }
+    .stats-grid{
+      display:grid; grid-template-columns: repeat(4,1fr); gap: 18px;
+      text-align:center;
+    }
+    .stat{
+      padding: 22px 10px;
+    }
+    .stat h3{
+      margin:0 0 6px; font-size: clamp(1.3rem, 1.2vw + .6rem, 2rem); font-family: var(--font-head)
+    }
+    .stat p{ margin:0; opacity:.95 }
+
+    /* =============================
+       REVIEWS
+    ==============================*/
+    .review-wrap{ position:relative }
+    .review-box{
+      display:flex; gap: 28px; align-items:center; justify-content:space-between;
+      padding: 28px; border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--card) 100%, transparent), color-mix(in oklab, var(--bg-2) 88%, transparent));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .score{
+      text-align:center; min-width: 140px;
+    }
+    .score strong{ font-size: 2.4rem; display:block; line-height:1; font-family: var(--font-head)}
+    .stars{ letter-spacing: 2px; margin-top: 6px}
+    .quote{ font-size: 1.1rem; color: var(--text)}
+    .author{ color: var(--muted); margin-top: 8px}
+    .dots{ display:flex; gap:8px; justify-content:center; margin-top: 14px}
+    .dot{
+      width: 10px; height: 10px; border-radius:50%; background: color-mix(in oklab, var(--text) 18%, var(--bg));
+      transition: background .25s var(--easing);
+    }
+    .dot.active{ background: linear-gradient(135deg, var(--primary), var(--primary-2))}
+
+    /* =============================
+       PRICING (Glassmorphism)
+    ==============================*/
+    .pricing{
+      background: color-mix(in oklab, var(--bg-2) 60%, var(--bg));
+      border-top: 1px solid var(--border);
+    }
+    .billing-toggle{
+      display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom: 24px;
+      background: color-mix(in oklab, var(--bg-2) 65%, transparent);
+      border:1px solid var(--border); padding:6px; border-radius: 999px; width: fit-content; margin-inline:auto;
+    }
+    .billing-toggle button{
+      border:none; background: transparent; color: var(--muted); font-weight:700; letter-spacing:.2px; padding:8px 14px; border-radius:999px; cursor:pointer;
+    }
+    .billing-toggle button.active{
+      background: color-mix(in oklab, var(--primary) 18%, var(--bg-2));
+      color:#fff;
+    }
+    .pricing-grid{
+      display:grid; gap:22px; grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+    .price-card{
+      position:relative; overflow:hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid color-mix(in oklab, var(--text) 10%, var(--border));
+      background: linear-gradient( to bottom right,
+        color-mix(in oklab, var(--bg) 70%, transparent),
+        color-mix(in oklab, var(--card) 100%, transparent) 60% );
+      box-shadow: var(--shadow-sm);
+      padding: 26px 22px;
+      backdrop-filter: saturate(120%) blur(10px);
+      transition: transform .35s var(--easing), box-shadow .35s var(--easing), border-color .35s var(--easing);
+    }
+    .price-card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-md) }
+    .featured{
+      border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+      box-shadow: 0 20px 80px color-mix(in oklab, var(--primary) 25%, transparent);
+    }
+    .tag{
+      position:absolute; top:16px; right:16px; font-size:.8rem; font-weight:800; padding:6px 10px; border-radius:999px; color:#fff;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+    .price{ font-family: var(--font-head); font-weight:800; font-size: 2rem; margin: 10px 0 4px}
+    .period{ color: var(--muted); font-size:.95rem}
+    .feat{ margin: 14px 0 0; padding:0; list-style:none}
+    .feat li{ display:flex; gap:8px; align-items:flex-start; margin:10px 0; color: var(--muted)}
+    .feat li::before{
+      content:""; flex:0 0 18px; height:18px; border-radius:4px; margin-top:3px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 6px 20px color-mix(in oklab, var(--primary) 35%, transparent);
+    }
+
+    /* =============================
+       COURSES (Filterable grid)
+    ==============================*/
+    .filters{
+      display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 22px;
+    }
+    .filter{
+      border:1px solid var(--border); background: color-mix(in oklab, var(--bg-2) 60%, transparent); color: var(--muted);
+      padding:8px 12px; border-radius: 999px; cursor:pointer; font-weight:600;
+      transition: background .25s var(--easing), color .25s var(--easing), transform .25s var(--easing);
+    }
+    .filter.active, .filter:hover{
+      background: color-mix(in oklab, var(--primary) 18%, var(--bg-2)); color:#fff; transform: translateY(-1px);
+    }
+    .course-grid{
+      display:grid; gap: 20px; grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .course{
+      border:1px solid var(--border); border-radius: var(--radius-lg); overflow:hidden; background: color-mix(in oklab, var(--bg-2) 85%, var(--bg));
+      transition: transform .35s var(--easing), box-shadow .35s var(--easing), opacity .3s var(--easing);
+      box-shadow: var(--shadow-sm);
+      opacity:1;
+    }
+    .course.hide{ opacity:0; transform: scale(.98); pointer-events:none; display:none }
+    .thumb{ position:relative; overflow:hidden }
+    .thumb img{ width:100%; height: 180px; object-fit: cover; transition: transform .6s var(--easing)}
+    .course:hover .thumb img{ transform: scale(1.06) }
+    .badge-cat{
+      position:absolute; left:12px; top:12px; padding:6px 10px; border-radius: 999px; color:#fff; font-size:.8rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 10px 24px color-mix(in oklab, var(--primary) 30%, transparent);
+    }
+    .course-body{ padding: 16px 16px 18px }
+    .course-title{ font-family: var(--font-head); font-weight:700; margin: 6px 0 8px; font-size:1.05rem }
+    .meta{ display:flex; gap:10px; color: var(--muted); font-size:.9rem }
+    .meta .dot{ width:6px; height:6px; border-radius:50%; background: color-mix(in oklab, var(--text) 18%, var(--bg)); align-self:center }
+    .course-actions{ margin-top: 12px; display:flex; gap:10px; flex-wrap:wrap }
+
+    /* =============================
+       FLOATING CTA
+    ==============================*/
+    .float-cta{
+      position: fixed; right: 20px; bottom: 20px; z-index: 1200;
+      padding: 12px 18px; border-radius: 999px;
+      border: none; color:#fff; font-weight:800; letter-spacing:.2px; cursor:pointer;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 14px 36px color-mix(in oklab, var(--primary) 30%, transparent);
+      transform: translateY(20px); opacity:0; pointer-events:none;
+      transition: transform .35s var(--easing), opacity .35s var(--easing);
+    }
+    .float-cta.show{ transform: translateY(0); opacity:1; pointer-events:auto }
+
+    /* =============================
+       FOOTER
+    ==============================*/
+    .footer{
+      background: color-mix(in oklab, var(--bg-2) 80%, var(--bg));
+      border-top: 1px solid var(--border);
+      padding-top: 70px;
+    }
+    .fgrid{ display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 36px }
+    .footer h3{ font-family: var(--font-head); margin: 0 0 10px}
+    .footer p, .footer li, .footer a{ color: var(--muted) }
+    .footer ul{ list-style:none; padding:0; margin:0}
+    .footer li{ margin: 10px 0}
+    .bottom{
+      border-top: 1px solid var(--border);
+      margin-top: 40px; padding: 18px 0;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px
+    }
+    .social a{ margin-right:12px }
+    .social a:hover{ color: var(--text)}
+
+    /* =============================
+       UTILITIES & ANIMATION
+    ==============================*/
+    .reveal{ opacity:0; transform: translateY(14px); transition: opacity .7s var(--easing), transform .7s var(--easing) }
+    .reveal.show{ opacity:1; transform: translateY(0)}
+    .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 18px}
+
+    /* =============================
+       RESPONSIVE
+    ==============================*/
+    @media (max-width: 1024px){
+      .hero-grid{ grid-template-columns: 1fr; gap: 28px}
+      .cards{ grid-template-columns: repeat(2,minmax(0,1fr))}
+      .split{ grid-template-columns: 1fr; }
+      .score{ min-width: 110px}
+      .pricing-grid{ grid-template-columns: 1fr 1fr }
+      .course-grid{ grid-template-columns: 1fr 1fr }
+    }
+    @media (max-width: 640px){
+      .nav-list{ display:none }
+      .cards{ grid-template-columns: 1fr}
+      .stats-grid{ grid-template-columns: 1fr 1fr }
+      .fgrid{ grid-template-columns: 1fr }
+      .grid-2{ grid-template-columns: 1fr }
+      .hero{ padding: 78px 0 58px}
+      .pricing-grid{ grid-template-columns: 1fr }
+      .course-grid{ grid-template-columns: 1fr }
+    }
+  </style>
+</head>
+<body>
+  <!-- ============= NAV ============= -->
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#">
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect width="100" height="100" rx="22" fill="url(#g)"/>
+          <path d="M25 30 H 75 M 50 30 V 70" stroke="white" stroke-width="12" stroke-linecap="round"/>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="100" y2="100">
+            <stop stop-color="#287bff"/><stop offset="1" stop-color="#0d46ff"/>
+          </linearGradient></defs>
+        </svg>
+        Tenx
+      </a>
+
+      <nav class="nav-list">
+        <a class="nav-link" href="#home">Home</a>
+        <a class="nav-link" href="#services">Services</a>
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#result">Result</a>
+        <a class="nav-link" href="#courses">Courses</a>
+        <a class="nav-link" href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="theme-switch">
+        <button class="chip active" data-t="t1">1. Blue–Gold</button>
+        <button class="chip" data-t="t2">2. Neon</button>
+        <button class="chip" data-t="t3">3. Minimal</button>
+        <button class="chip" data-t="t4">4. Bold</button>
+        <a class="btn btn-primary" href="#pricing">Log in</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============= HERO ============= -->
+  <section id="home" class="hero">
+    <span class="blob one"></span>
+    <span class="blob two"></span>
+    <span class="ring"></span>
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">Our Toppers — 2025</span>
+        <h1>Join the <span style="background:linear-gradient(135deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent">top 1%</span> with world-class mentors & a job-ready curriculum.</h1>
+        <p class="sub">Tenx students consistently secure elite ranks in GATE & tech placements. Learn with a portfolio-first approach, interview prep, and a powerful alumni network.</p>
+        <div class="hero-cta">
+         <button class="btn btn-primary" onclick="openFormWindow()">Register Now</button>
+
+          <a class="btn btn-primary" href="#courses">Explore Programs</a>
+          <a class="btn btn-ghost" href="#pricing">View Fee Plans</a>
+        </div>
+        <div class="grid-2" style="margin-top:18px">
+          <span class="badge">Scholarships available</span>
+          <span class="badge">EMI options</span>
+        </div>
+      </div>
+      <div class="media reveal">
+        <img alt="Students collaborating" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SERVICES ============= -->
+  <section id="services">
+    <div class="container">
+      <h2 class="section-title reveal">Our Core Services</h2>
+      <p class="section-sub reveal">Designed for outcomes. Every module ladders up to a real-world milestone.</p>
+      <div class="cards">
+        <article class="card reveal">
+          <span class="badge">Mentors</span>
+          <h3>Expert Mentorship</h3>
+          <p>Personalized roadmaps, 1-on-1 doubt solving, and guidance from rankers & industry veterans.</p>
+        </article>
+        <article class="card reveal">
+          <span class="badge">Curriculum</span>
+          <h3>Comprehensive Curriculum</h3>
+          <p>Continuously updated with in-demand skills, rigorous theory, and hands-on projects.</p>
+        </article>
+        <article class="card reveal">
+          <span class="badge">Career</span>
+          <h3>Career Support</h3>
+          <p>Resume workshops, mock interviews, and access to 200+ hiring partners.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= WHY US ============= -->
+  <section id="about">
+    <div class="container split">
+      <div class="media reveal">
+        <img alt="Team meeting" src="https://burst.shopifycdn.com/photos/team-sales-business-meeting.jpg?width=1000&format=pjpg&exif=0&iptc=0" />
+      </div>
+      <div class="reveal">
+        <h2 class="section-title">Why choose Tenx</h2>
+        <p class="section-sub">We’re a community of makers and mentors. Build momentum with structure, support, and accountability.</p>
+        <ul class="ticks">
+          <li><span class="tick"></span><span><strong>Proven Track Record:</strong> Consistent top ranks in competitive exams & high-quality placements.</span></li>
+          <li><span class="tick"></span><span><strong>Flexible Learning:</strong> Live, self-paced, and hybrid batches that fit your routine.</span></li>
+          <li><span class="tick"></span><span><strong>Project-based:</strong> Ship portfolio-ready work that shows real skills from day one.</span></li>
+          <li><span class="tick"></span><span><strong>Supportive Network:</strong> Alumni, peers, mentors—grow with the right circle.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= STATS ============= -->
+  <section id="result" class="stats">
+    <div class="container stats-grid">
+      <!-- Stats will be loaded dynamically from API -->
+      <div class="stat reveal">
+        <h3>Result 2024 Topper</h3>
+        <p>A. Sharma — AIR 1 (GATE CS)</p>
+      </div>
+      <div class="stat reveal">
+        <h3>95%</h3>
+        <p>Placement Rate (2024)</p>
+      </div>
+      <div class="stat reveal">
+        <h3>10,000+</h3>
+        <p>Alumni Worldwide</p>
+      </div>
+      <div class="stat reveal">
+        <h3>4.8/5</h3>
+        <p>Avg. Student Rating</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= COURSES (Filterable) ============= -->
+  <section id="courses">
+    <div class="container">
+      <h2 class="section-title reveal">Courses</h2>
+      <p class="section-sub reveal">Pick a track and start building a portfolio that converts into offers.</p>
+
+      <div class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="gate">GATE</button>
+        <button class="filter" data-filter="web">Web Dev</button>
+        <button class="filter" data-filter="data">Data/AI</button>
+        <button class="filter" data-filter="system">System Design</button>
+      </div>
+
+      <div class="course-grid" id="courseGrid">
+        <!-- Courses will be loaded dynamically from API -->
+        <!-- Fallback static courses if API fails -->
+        <article class="course reveal" data-cat="gate">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop" alt="GATE prep" />
+            <span class="badge-cat">GATE</span>
+          </div>
+          <div class="course-body">
+            <div class="course-title">GATE CS 2026 — Ranker's Track</div>
+            <div class="meta"><span>Intermediate</span><span class="dot"></span><span>8 months</span></div>
+            <div class="course-actions">
+              <button class="btn btn-primary enroll-btn" data-course-id="fallback-gate" data-course-title="GATE CS 2026 — Ranker's Track">Enroll</button>
+              <button class="btn btn-ghost details-btn" data-course-id="fallback-gate">Syllabus</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= PRICING (Glass) ============= -->
+  <section id="pricing" class="pricing">
+    <div class="container">
+      <h2 class="section-title reveal">Transparent Pricing</h2>
+      <p class="section-sub reveal">Simple plans with scholarships & EMI. Switch billing to see the best value.</p>
+
+      <div class="billing-toggle" role="tablist" aria-label="Billing toggle">
+        <button class="active" data-bill="monthly" aria-selected="true">Monthly</button>
+        <button data-bill="yearly" aria-selected="false">Yearly <span style="opacity:.8">(-20%)</span></button>
+      </div>
+
+      <div class="pricing-grid" id="pricingGrid">
+        <!-- Pricing plans will be loaded dynamically from API -->
+        <!-- Fallback static pricing if API fails -->
+        <article class="price-card reveal" aria-label="Starter plan">
+          <div class="badge">Starter</div>
+          <div class="price" data-price-month="₹3,999" data-price-year="₹3,199">₹3,999</div>
+          <div class="period">per month</div>
+          <ul class="feat">
+            <li>Self-paced content</li>
+            <li>Community access</li>
+            <li>Monthly mentor AMA</li>
+          </ul>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary subscribe-btn" data-plan="starter" data-plan-price="3999">Get Started</button>
+            <button class="btn btn-ghost plan-details-btn" data-plan="starter">Details</button>
+          </div>
+        </article>
+      </div>
+      <p class="section-sub" style="margin-top:18px">* Scholarships available. EMI from ₹1,499/month.</p>
+    </div>
+  </section>
+
+  <!-- ============= REVIEWS ============= -->
+  <section>
+    <div class="container review-wrap">
+      <h2 class="section-title reveal">What students say</h2>
+      <div class="review-box reveal" id="reviewBox">
+        <div class="score">
+          <strong id="scoreVal">4.4</strong>
+          <div class="stars" id="stars">★★★★☆</div>
+          <div style="margin-top:6px; color:var(--muted)">Based on <strong>5349</strong> ratings</div>
+        </div>
+        <div>
+          <p class="quote" id="quote">“The curriculum is perfectly structured, and the mentors are incredibly supportive. I went from zero to job-ready in 6 months.”</p>
+          <div class="author" id="author">— Priya R.</div>
+          <div class="dots" id="dots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= FOOTER ============= -->
+  <footer class="footer">
+    <div class="container fgrid">
+      <div>
+        <h3>About Tenx</h3>
+        <p>High-quality, results-oriented education—accessible to all. Built by educators and industry pros for the next generation of leaders.</p>
+      </div>
+      <div>
+        <h3>Courses</h3>
+        <ul>
+          <li><a href="#">Web Development Bootcamp</a></li>
+          <li><a href="#">Data Science &amp; AI</a></li>
+          <li><a href="#">GATE 2026 Preparation</a></li>
+          <li><a href="#">System Design</a></li>
+          <li><a href="#">View All Courses</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policy</h3>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container bottom">
+      <div class="social">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter/X</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">YouTube</a>
+      </div>
+      <div>© 2025 Tenx. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Floating CTA -->
+  <button class="float-cta" id="floatCta">Enroll Now</button>
+
+  <!-- ============= JS (theme, reveal, filters, pricing toggle, reviews, CTA) ============= -->
+  <script>
+    // ============= API Configuration =============
+    const API_BASE_URL = 'http://localhost:5000';
+    
+    // ============= Helper Functions =============
+    async function fetchAPI(url) {
+      try {
+        console.log(`📡 Fetching: ${url}`);
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.error(`❌ API Error: ${response.status} ${response.statusText}`);
+          throw new Error(`API request failed: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(`✅ API Response from ${url}:`, data);
+        return data;
+      } catch (error) {
+        console.error(`❌ API Error for ${url}:`, error.message);
+        return null;
+      }
+    }
+
+    function formatPrice(price) {
+      return '₹' + price.toLocaleString('en-IN');
+    }
+
+    function getStars(rating) {
+      const fullStars = Math.floor(rating);
+      const halfStar = rating % 1 >= 0.5;
+      return '★'.repeat(fullStars) + (halfStar ? '☆' : '') + '☆'.repeat(5 - fullStars - (halfStar ? 1 : 0));
+    }
+
+    // ============= Load Stats =============
+    async function loadStats() {
+      console.log('📊 Loading stats...');
+      const result = await fetchAPI(`${API_BASE_URL}/api/stats`);
+      if (result && result.success && result.stats) {
+        const stats = result.stats;
+        console.log('📊 Stats loaded:', stats);
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid && stats) {
+          statsGrid.innerHTML = `
+            <div class="stat reveal">
+              <h3>Result ${stats.year || '2024'} Topper</h3>
+              <p>${stats.topperName || 'A. Sharma'} — ${stats.topperRank || 'AIR 1 (GATE CS)'}</p>
+            </div>
+            <div class="stat reveal">
+              <h3>${stats.placementRate || 95}%</h3>
+              <p>Placement Rate (${stats.year || '2024'})</p>
+            </div>
+            <div class="stat reveal">
+              <h3>${(stats.alumniCount || 10000).toLocaleString()}+</h3>
+              <p>Alumni Worldwide</p>
+            </div>
+            <div class="stat reveal">
+              <h3>${(stats.averageRating || 4.8).toFixed(1)}/5</h3>
+              <p>Avg. Student Rating</p>
+            </div>
+          `;
+          console.log('✅ Stats updated in UI');
+          // Re-observe reveal elements
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                e.target.classList.add('show');
+                io.unobserve(e.target);
+              }
+            });
+          }, { threshold: .12 });
+          document.querySelectorAll('.stats-grid .reveal').forEach(el => io.observe(el));
+        }
+      } else {
+        console.warn('⚠️ Stats API failed or no data, using default stats');
+        console.log('💡 Tip: Run "npm run seed" in the backend directory to seed the database');
+      }
+    }
+
+    // ============= Load Courses =============
+    async function loadCourses(category = 'all') {
+      console.log(`📚 Loading courses (category: ${category})...`);
+      const url = category === 'all' 
+        ? `${API_BASE_URL}/api/courses`
+        : `${API_BASE_URL}/api/courses?category=${category}`;
+      
+      const result = await fetchAPI(url);
+      console.log(`📚 Courses API result:`, result);
+      
+      if (result && result.success && result.courses && result.courses.length > 0) {
+        console.log(`✅ Found ${result.courses.length} courses, updating UI...`);
+        const courseGrid = document.querySelector('.course-grid');
+        if (courseGrid) {
+          courseGrid.innerHTML = result.courses.map(course => `
+            <article class="course reveal" data-cat="${course.category}">
+              <div class="thumb">
+                <img src="${course.image ? `${API_BASE_URL}/uploads/${course.image}` : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop'}" alt="${course.title}" />
+                <span class="badge-cat">${course.category ? course.category.charAt(0).toUpperCase() + course.category.slice(1) : 'Course'}</span>
+              </div>
+              <div class="course-body">
+                <div class="course-title">${course.title}</div>
+                <div class="meta">
+                  <span>${course.level ? course.level.charAt(0).toUpperCase() + course.level.slice(1) : 'Intermediate'}</span>
+                  <span class="dot"></span>
+                  <span>${course.duration || 'N/A'}</span>
+                </div>
+                <div class="course-actions">
+                  <button class="btn btn-primary enroll-btn" data-course-id="${course._id}" data-course-title="${course.title}">Enroll</button>
+                  <button class="btn btn-ghost details-btn" data-course-id="${course._id}">Details</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+          
+          console.log('✅ Courses updated in UI');
+          
+          // Re-observe reveal elements
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                e.target.classList.add('show');
+                io.unobserve(e.target);
+              }
+            });
+          }, { threshold: .12 });
+          document.querySelectorAll('.course-grid .reveal').forEach(el => io.observe(el));
+          
+          // Re-attach filter functionality
+          attachCourseFilters();
+          
+          // Attach enrollment button handlers
+          attachEnrollmentHandlers();
+        }
+      } else {
+        if (result && result.success && result.courses && result.courses.length === 0) {
+          console.warn('⚠️ No courses found in database!');
+          console.log('💡 Tip: Run "npm run seed" in the backend directory to seed the database');
+        } else {
+          console.warn('⚠️ Courses API failed, using default courses');
+        }
+        // Keep existing static courses
+      }
+    }
+
+    // ============= Load Pricing Plans =============
+    async function loadPricingPlans() {
+      console.log('💰 Loading pricing plans...');
+      const result = await fetchAPI(`${API_BASE_URL}/api/pricing`);
+      console.log('💰 Pricing API result:', result);
+      
+      if (result && result.success && result.plans && result.plans.length > 0) {
+        console.log(`✅ Found ${result.plans.length} pricing plans, updating UI...`);
+        const pricingGrid = document.querySelector('.pricing-grid');
+        if (pricingGrid) {
+          pricingGrid.innerHTML = result.plans.map(plan => `
+            <article class="price-card reveal ${plan.isRecommended ? 'featured' : ''}" aria-label="${plan.name} plan">
+              ${plan.isRecommended ? '<span class="tag">Recommended</span>' : ''}
+              <div class="badge">${plan.name ? plan.name.charAt(0).toUpperCase() + plan.name.slice(1) : 'Plan'}</div>
+              <div class="price" data-price-month="${formatPrice(plan.monthlyPrice || 0)}" data-price-year="${formatPrice(plan.yearlyPrice || 0)}">${formatPrice(plan.monthlyPrice || 0)}</div>
+              <div class="period">per month</div>
+              <ul class="feat">
+                ${(plan.features || []).map(feat => `<li>${feat}</li>`).join('')}
+              </ul>
+              <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary subscribe-btn" data-plan="${plan.name}" data-plan-price="${plan.monthlyPrice}">Get Started</button>
+                <button class="btn btn-ghost plan-details-btn" data-plan="${plan.name}">Details</button>
+              </div>
+            </article>
+          `).join('');
+          
+          console.log('✅ Pricing plans updated in UI');
+          
+          // Re-observe reveal elements
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                e.target.classList.add('show');
+                io.unobserve(e.target);
+              }
+            });
+          }, { threshold: .12 });
+          document.querySelectorAll('.pricing-grid .reveal').forEach(el => io.observe(el));
+          
+          // Re-attach pricing toggle
+          attachPricingToggle();
+          
+          // Attach subscription button handlers
+          attachSubscriptionHandlers();
+        }
+      } else {
+        if (result && result.success && result.plans && result.plans.length === 0) {
+          console.warn('⚠️ No pricing plans found in database!');
+          console.log('💡 Tip: Run "npm run seed" in the backend directory to seed the database');
+        } else {
+          console.warn('⚠️ Pricing API failed, using default pricing');
+        }
+        // Keep existing static pricing
+        attachPricingToggle();
+      }
+    }
+
+    // ============= Load Reviews =============
+    async function loadReviews() {
+      console.log('⭐ Loading reviews...');
+      const result = await fetchAPI(`${API_BASE_URL}/api/reviews`);
+      console.log('⭐ Reviews API result:', result);
+      
+      if (result && result.success) {
+        const reviews = result.reviews || [];
+        const averageRating = result.averageRating || 4.8;
+        const totalRatings = result.totalRatings || 5349;
+        
+        console.log(`✅ Found ${reviews.length} reviews, average rating: ${averageRating}, total: ${totalRatings}`);
+        
+        // Update average rating display
+        const scoreEl = document.getElementById('scoreVal');
+        const starsEl = document.getElementById('stars');
+        const ratingCountEl = document.querySelector('.score div:last-child');
+        
+        if (scoreEl) {
+          scoreEl.textContent = averageRating.toFixed(1);
+          console.log('✅ Updated rating score:', averageRating.toFixed(1));
+        }
+        if (starsEl) {
+          starsEl.textContent = getStars(averageRating);
+          console.log('✅ Updated stars:', getStars(averageRating));
+        }
+        if (ratingCountEl) {
+          ratingCountEl.innerHTML = `Based on <strong>${totalRatings.toLocaleString()}</strong> ratings`;
+          console.log('✅ Updated rating count:', totalRatings);
+        }
+        
+        // Update reviews carousel if reviews exist
+        if (reviews.length > 0) {
+          reviewData = reviews.map(r => ({
+            score: r.rating.toFixed(1),
+            stars: getStars(r.rating),
+            quote: `"${r.comment || 'Great course!'}"`,
+            author: `— ${r.userName || 'Anonymous'}`
+          }));
+          
+          console.log('✅ Updated review carousel with', reviewData.length, 'reviews');
+          
+          // Initialize review carousel
+          if (reviewData.length > 0) {
+            initializeReviewCarousel();
+          }
+        } else {
+          console.warn('⚠️ No reviews found in database!');
+          console.log('💡 Tip: Run "npm run seed" in the backend directory to seed the database');
+        }
+      } else {
+        console.warn('⚠️ Reviews API failed, using default reviews');
+      }
+    }
+
+    // ============= Review Carousel =============
+    let reviewData = [
+      {score:'4.4', stars:'★★★★☆', quote:'"The curriculum is perfectly structured, and the mentors are incredibly supportive. I went from zero to job-ready in 6 months."', author:'— Priya R.'},
+      {score:'4.7', stars:'★★★★★', quote:'"Projects are legit. My portfolio stood out instantly and helped me crack three interviews."', author:'— Aman S.'},
+      {score:'4.6', stars:'★★★★★', quote:'"Smart pacing + strong fundamentals. Tenx is the best investment I made in myself."', author:'— Neha T.'}
+    ];
+
+    function initializeReviewCarousel() {
+      const score = document.getElementById('scoreVal');
+      const stars = document.getElementById('stars');
+      const quote = document.getElementById('quote');
+      const author = document.getElementById('author');
+      const dots = document.getElementById('dots');
+      
+      if (!dots) return;
+      
+      // Clear existing dots
+      dots.innerHTML = '';
+      
+      let ix = 0;
+      function renderReview(i) {
+        if (!reviewData[i]) return;
+        const d = reviewData[i];
+        if (score) score.textContent = d.score;
+        if (stars) stars.textContent = d.stars;
+        if (quote) quote.textContent = d.quote;
+        if (author) author.textContent = d.author;
+        [...dots.children].forEach((el, idx) => el.classList.toggle('active', idx === i));
+      }
+      
+      reviewData.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => { ix = i; renderReview(ix); });
+        dots.appendChild(dot);
+      });
+      
+      setInterval(() => {
+        ix = (ix + 1) % reviewData.length;
+        renderReview(ix);
+      }, 5000);
+      
+      renderReview(0);
+    }
+
+    // ============= Enrollment Handlers =============
+    function attachEnrollmentHandlers() {
+      const enrollButtons = document.querySelectorAll('.enroll-btn');
+      enrollButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const courseId = btn.getAttribute('data-course-id');
+          const courseTitle = btn.getAttribute('data-course-title') || 'Course';
+          
+          // Check if user is logged in
+          const token = localStorage.getItem('token');
+          
+          if (!token) {
+            // User not logged in - show login prompt
+            const login = confirm(`You need to login to enroll in "${courseTitle}".\n\nWould you like to register/login now?`);
+            if (login) {
+              // Scroll to pricing section for registration
+              document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+              // You can add a login modal here later
+              alert('Please register/login first. You can use the registration form or login feature.');
+            }
+            return;
+          }
+          
+          // User is logged in - proceed with enrollment
+          try {
+            btn.disabled = true;
+            btn.textContent = 'Enrolling...';
+            
+            console.log(`📝 Enrolling in course: ${courseTitle} (${courseId})`);
+            
+            const response = await fetch(`${API_BASE_URL}/api/enrollments`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ courseId })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              alert(`✅ Successfully enrolled in "${courseTitle}"!`);
+              console.log('✅ Enrollment successful:', result);
+            } else {
+              if (result.message && result.message.includes('Already enrolled')) {
+                alert(`ℹ️ You are already enrolled in "${courseTitle}"`);
+              } else {
+                alert(`❌ Enrollment failed: ${result.message || 'Unknown error'}`);
+              }
+              console.error('❌ Enrollment failed:', result);
+            }
+          } catch (error) {
+            console.error('❌ Enrollment error:', error);
+            alert(`❌ Error enrolling in course. Please try again.`);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = 'Enroll';
+          }
+        });
+      });
+      
+      // Details button handlers
+      const detailsButtons = document.querySelectorAll('.details-btn');
+      detailsButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const courseId = btn.getAttribute('data-course-id');
+          alert(`Course details for ID: ${courseId}\n\nThis feature will show detailed course information.`);
+        });
+      });
+    }
+    
+    // ============= Subscription Handlers =============
+    function attachSubscriptionHandlers() {
+      const subscribeButtons = document.querySelectorAll('.subscribe-btn');
+      subscribeButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const planName = btn.getAttribute('data-plan');
+          const planPrice = btn.getAttribute('data-plan-price');
+          const planDisplayName = planName.charAt(0).toUpperCase() + planName.slice(1);
+          
+          // Check if user is logged in
+          const token = localStorage.getItem('token');
+          
+          if (!token) {
+            // User not logged in - show registration prompt
+            const register = confirm(`You need to register/login to subscribe to the ${planDisplayName} plan (₹${parseInt(planPrice).toLocaleString('en-IN')}/month).\n\nWould you like to register now?`);
+            if (register) {
+              // Open registration form
+              openFormWindow();
+            }
+            return;
+          }
+          
+          // User is logged in - proceed with subscription
+          const confirmSub = confirm(`Subscribe to ${planDisplayName} Plan?\n\nPrice: ₹${parseInt(planPrice).toLocaleString('en-IN')}/month\n\nThis will redirect you to payment.`);
+          
+          if (!confirmSub) return;
+          
+          try {
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            console.log(`💳 Subscribing to plan: ${planDisplayName}`);
+            
+            // Create payment
+            const response = await fetch(`${API_BASE_URL}/api/payments`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                amount: parseInt(planPrice),
+                currency: 'INR',
+                paymentMethod: 'subscription',
+                plan: planName
+              })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              alert(`✅ Subscription initiated for ${planDisplayName} Plan!\n\nPayment ID: ${result.payment._id}\n\nIn production, this would redirect to payment gateway.`);
+              console.log('✅ Subscription successful:', result);
+              
+              // In production, redirect to payment gateway here
+              // window.location.href = paymentGatewayUrl;
+            } else {
+              alert(`❌ Subscription failed: ${result.message || 'Unknown error'}`);
+              console.error('❌ Subscription failed:', result);
+            }
+          } catch (error) {
+            console.error('❌ Subscription error:', error);
+            alert(`❌ Error processing subscription. Please try again.`);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = 'Get Started';
+          }
+        });
+      });
+      
+      // Plan details button handlers
+      const planDetailsButtons = document.querySelectorAll('.plan-details-btn');
+      planDetailsButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const planName = btn.getAttribute('data-plan');
+          alert(`Plan details for: ${planName.charAt(0).toUpperCase() + planName.slice(1)}\n\nThis feature will show detailed plan information.`);
+        });
+      });
+    }
+
+    // ============= Course Filters =============
+    function attachCourseFilters() {
+      const filterBtns = document.querySelectorAll('.filter');
+      const courses = document.querySelectorAll('.course');
+      
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const cat = btn.dataset.filter;
+          
+          if (cat === 'all') {
+            // Load all courses from API
+            loadCourses('all');
+          } else {
+            // Filter existing courses or load from API
+            courses.forEach(card => {
+              const match = card.dataset.cat === cat;
+              card.classList.toggle('hide', !match);
+            });
+            
+            // Also load from API for fresh data
+            loadCourses(cat);
+          }
+        });
+      });
+    }
+
+    // ============= Pricing Toggle =============
+    function attachPricingToggle() {
+      const billButtons = document.querySelectorAll('.billing-toggle button');
+      const priceEls = document.querySelectorAll('.price');
+      
+      function setBilling(mode) {
+        priceEls.forEach(p => {
+          const m = p.getAttribute('data-price-month');
+          const y = p.getAttribute('data-price-year');
+          p.textContent = mode === 'yearly' ? y : m;
+        });
+        billButtons.forEach(b => {
+          b.classList.toggle('active', b.dataset.bill === mode);
+          b.setAttribute('aria-selected', b.dataset.bill === mode ? 'true' : 'false');
+        });
+        document.querySelectorAll('.period').forEach(el => {
+          el.textContent = mode === 'yearly' ? 'per month (billed yearly)' : 'per month';
+        });
+      }
+      
+      billButtons.forEach(b => b.addEventListener('click', () => setBilling(b.dataset.bill)));
+      setBilling('monthly');
+    }
+
+    // ============= Theme Switcher =============
+    const chips = document.querySelectorAll('.chip');
+    const root = document.documentElement;
+    chips.forEach(c => {
+      c.addEventListener('click', () => {
+        chips.forEach(x => x.classList.remove('active'));
+        c.classList.add('active');
+        root.setAttribute('data-theme', c.dataset.t);
+      });
+    });
+
+    // ============= Scroll Reveal =============
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('show');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // ============= Floating CTA =============
+    const floatBtn = document.getElementById('floatCta');
+    if (floatBtn) {
+      window.addEventListener('scroll', () => {
+        const show = window.scrollY > 320;
+        floatBtn.classList.toggle('show', show);
+      });
+      floatBtn.addEventListener('click', () => {
+        document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // ============= Initialize on Page Load =============
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Loading data from backend...');
+      console.log('📡 API Base URL:', API_BASE_URL);
+      
+      // Load all data from backend
+      const results = await Promise.allSettled([
+        loadStats(),
+        loadCourses('all'),
+        loadPricingPlans(),
+        loadReviews()
+      ]);
+      
+      // Log results
+      results.forEach((result, index) => {
+        const names = ['Stats', 'Courses', 'Pricing', 'Reviews'];
+        if (result.status === 'fulfilled') {
+          console.log(`✅ ${names[index]} loaded successfully`);
+        } else {
+          console.error(`❌ ${names[index]} failed:`, result.reason);
+        }
+      });
+      
+      // Initialize review carousel
+      initializeReviewCarousel();
+      
+      // Attach event listeners
+      attachCourseFilters();
+      attachPricingToggle();
+      attachEnrollmentHandlers();
+      attachSubscriptionHandlers();
+      
+      console.log('✅ Data loading complete!');
+      console.log('💡 Check the logs above to see what data was loaded from the backend');
+      console.log('💡 If you see "No data found", run "npm run seed" in the backend directory');
+    });
+  </script>
+  <script>
+function openFormWindow() {
+  window.open("registration-form.html", "_blank", "width=1200,height=900,scrollbars=yes");
+}
+</script>
+</body>
+</html>
