@@ -129,6 +129,77 @@
         content: "←";
         font-size: 18px;
     }
+
+    .otp-section {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        display: none;
+    }
+
+    .otp-section.active {
+        display: block;
+    }
+
+    .otp-input-group {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin-top: 10px;
+    }
+
+    .otp-input-group input {
+        flex: 1;
+        max-width: 200px;
+        margin-top: 0;
+    }
+
+    .send-otp-btn, .verify-otp-btn {
+        padding: 10px 20px;
+        background: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.3s ease;
+    }
+
+    .send-otp-btn:hover, .verify-otp-btn:hover {
+        background: #218838;
+    }
+
+    .send-otp-btn:disabled, .verify-otp-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .otp-timer {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+    .otp-timer.expired {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .otp-success {
+        color: #28a745;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+
+    .otp-error {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 8px;
+    }
 </style>
 </head>
 
@@ -152,7 +223,19 @@
 
         <div class="col">
             <label>Mobile Number *</label>
-            <input type="text" name="mobile" required placeholder="Your Mobile Number">
+            <input type="text" name="mobile" id="mobileNumber" required placeholder="Your Mobile Number" maxlength="10" pattern="[0-9]{10}">
+            <div class="otp-section" id="otpSection">
+                <label>OTP Verification *</label>
+                <div class="otp-input-group">
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+                    <button type="button" class="verify-otp-btn" id="verifyOtpBtn">Verify OTP</button>
+                </div>
+                <div class="otp-timer" id="otpTimer"></div>
+                <div class="otp-success" id="otpSuccess" style="display: none;">✓ OTP Verified Successfully!</div>
+                <div class="otp-error" id="otpError"></div>
+                <button type="button" class="send-otp-btn" id="resendOtpBtn" style="margin-top: 10px; display: none;">Resend OTP</button>
+            </div>
+            <button type="button" class="send-otp-btn" id="sendOtpBtn" style="margin-top: 10px; display: none;">Send OTP</button>
         </div>
 
         <div class="col">
@@ -275,6 +358,242 @@ const submitBtn = document.getElementById('submitBtn');
 const messageDiv = document.getElementById('message');
 const STORAGE_KEY = 'tenx_registration_form_data';
 
+// OTP Verification Variables
+const mobileInput = document.getElementById('mobileNumber');
+const otpSection = document.getElementById('otpSection');
+const otpInput = document.getElementById('otpInput');
+const sendOtpBtn = document.getElementById('sendOtpBtn');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const resendOtpBtn = document.getElementById('resendOtpBtn');
+const otpTimer = document.getElementById('otpTimer');
+const otpSuccess = document.getElementById('otpSuccess');
+const otpError = document.getElementById('otpError');
+let otpGenerated = null;
+let otpExpiryTime = null;
+let otpTimerInterval = null;
+let isOtpVerified = false;
+
+// Generate 6-digit OTP
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Format timer display
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Start OTP timer (5 minutes = 300 seconds)
+function startOTPTimer() {
+    let timeLeft = 300; // 5 minutes
+    
+    otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        otpTimer.textContent = `OTP expires in: ${formatTime(timeLeft)}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            otpTimer.textContent = 'OTP has expired. Please request a new one.';
+            otpTimer.classList.add('expired');
+            otpGenerated = null;
+            resendOtpBtn.style.display = 'block';
+        }
+    }, 1000);
+    
+    otpTimer.textContent = `OTP expires in: ${formatTime(timeLeft)}`;
+}
+
+// Send OTP (In production, this would call your backend API)
+async function sendOTP(phoneNumber) {
+    try {
+        // Generate OTP
+        otpGenerated = generateOTP();
+        otpExpiryTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
+        
+        // Store OTP in sessionStorage (in production, backend would send SMS)
+        sessionStorage.setItem('otp_' + phoneNumber, otpGenerated);
+        sessionStorage.setItem('otp_expiry_' + phoneNumber, otpExpiryTime.toString());
+        
+        // In production, you would call your backend API here:
+        // const response = await fetch(`${API_BASE_URL}/send-otp`, {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({ phone: phoneNumber })
+        // });
+        
+        // For demo purposes, show OTP in console and alert
+        console.log(`OTP for ${phoneNumber}: ${otpGenerated}`);
+        alert(`OTP sent to ${phoneNumber}!\n\nFor demo: OTP is ${otpGenerated}\n(In production, this would be sent via SMS)`);
+        
+        // Show OTP section
+        otpSection.classList.add('active');
+        sendOtpBtn.style.display = 'none';
+        resendOtpBtn.style.display = 'none';
+        otpInput.value = '';
+        otpInput.focus();
+        otpError.textContent = '';
+        otpSuccess.style.display = 'none';
+        isOtpVerified = false;
+        
+        // Start timer
+        if (otpTimerInterval) clearInterval(otpTimerInterval);
+        startOTPTimer();
+        
+        // Disable form submission until OTP is verified
+        updateFormSubmissionState();
+        
+        return true;
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        otpError.textContent = 'Failed to send OTP. Please try again.';
+        return false;
+    }
+}
+
+// Verify OTP
+function verifyOTP() {
+    const enteredOTP = otpInput.value.trim();
+    const phoneNumber = mobileInput.value.trim();
+    
+    if (!enteredOTP || enteredOTP.length !== 6) {
+        otpError.textContent = 'Please enter a valid 6-digit OTP.';
+        return false;
+    }
+    
+    // Get stored OTP
+    const storedOTP = sessionStorage.getItem('otp_' + phoneNumber);
+    const storedExpiry = sessionStorage.getItem('otp_expiry_' + phoneNumber);
+    
+    if (!storedOTP) {
+        otpError.textContent = 'OTP not found. Please request a new OTP.';
+        return false;
+    }
+    
+    // Check if OTP expired
+    if (storedExpiry && Date.now() > parseInt(storedExpiry)) {
+        otpError.textContent = 'OTP has expired. Please request a new one.';
+        otpGenerated = null;
+        resendOtpBtn.style.display = 'block';
+        return false;
+    }
+    
+    // Verify OTP
+    if (enteredOTP === storedOTP) {
+        isOtpVerified = true;
+        otpSuccess.style.display = 'block';
+        otpError.textContent = '';
+        otpInput.disabled = true;
+        verifyOtpBtn.disabled = true;
+        resendOtpBtn.style.display = 'none';
+        
+        if (otpTimerInterval) {
+            clearInterval(otpTimerInterval);
+            otpTimer.textContent = 'OTP Verified ✓';
+        }
+        
+        // Enable form submission
+        updateFormSubmissionState();
+        
+        // Clear OTP from storage
+        sessionStorage.removeItem('otp_' + phoneNumber);
+        sessionStorage.removeItem('otp_expiry_' + phoneNumber);
+        
+        return true;
+    } else {
+        otpError.textContent = 'Invalid OTP. Please try again.';
+        return false;
+    }
+}
+
+// Update form submission state based on OTP verification
+function updateFormSubmissionState() {
+    if (!isOtpVerified) {
+        submitBtn.disabled = true;
+        submitBtn.title = 'Please verify your mobile number with OTP first';
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.title = '';
+    }
+}
+
+// Mobile number input handler
+mobileInput.addEventListener('input', function() {
+    const phoneNumber = this.value.trim();
+    
+    // Validate phone number (10 digits)
+    if (phoneNumber.length === 10 && /^[0-9]{10}$/.test(phoneNumber)) {
+        sendOtpBtn.style.display = 'block';
+        
+        // Check if OTP was already verified for this number
+        const verifiedPhone = sessionStorage.getItem('verified_phone');
+        if (verifiedPhone === phoneNumber) {
+            isOtpVerified = true;
+            otpSection.classList.add('active');
+            otpSuccess.style.display = 'block';
+            otpInput.disabled = true;
+            verifyOtpBtn.disabled = true;
+            updateFormSubmissionState();
+        } else {
+            isOtpVerified = false;
+            otpSection.classList.remove('active');
+            otpSuccess.style.display = 'none';
+            updateFormSubmissionState();
+        }
+    } else {
+        sendOtpBtn.style.display = 'none';
+        otpSection.classList.remove('active');
+        isOtpVerified = false;
+        updateFormSubmissionState();
+    }
+});
+
+// Send OTP button click
+sendOtpBtn.addEventListener('click', function() {
+    const phoneNumber = mobileInput.value.trim();
+    if (phoneNumber.length === 10 && /^[0-9]{10}$/.test(phoneNumber)) {
+        sendOtpBtn.disabled = true;
+        sendOtpBtn.textContent = 'Sending...';
+        sendOTP(phoneNumber).then(() => {
+            sendOtpBtn.disabled = false;
+            sendOtpBtn.textContent = 'Send OTP';
+        });
+    }
+});
+
+// Resend OTP button click
+resendOtpBtn.addEventListener('click', function() {
+    const phoneNumber = mobileInput.value.trim();
+    if (phoneNumber.length === 10 && /^[0-9]{10}$/.test(phoneNumber)) {
+        resendOtpBtn.disabled = true;
+        resendOtpBtn.textContent = 'Resending...';
+        sendOTP(phoneNumber).then(() => {
+            resendOtpBtn.disabled = false;
+            resendOtpBtn.textContent = 'Resend OTP';
+        });
+    }
+});
+
+// Verify OTP button click
+verifyOtpBtn.addEventListener('click', function() {
+    if (verifyOTP()) {
+        const phoneNumber = mobileInput.value.trim();
+        sessionStorage.setItem('verified_phone', phoneNumber);
+    }
+});
+
+// Allow Enter key to verify OTP
+otpInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyOtpBtn.click();
+    }
+});
+
+// Initialize form submission state
+updateFormSubmissionState();
+
 // Function to save form data to localStorage
 function saveFormData() {
     const formData = new FormData(form);
@@ -347,6 +666,18 @@ function showMessage(text, type = 'success') {
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // Check if OTP is verified
+    if (!isOtpVerified) {
+        showMessage('❌ Please verify your mobile number with OTP before submitting the form.', 'error');
+        otpSection.classList.add('active');
+        if (otpInput.value.trim() === '') {
+            otpInput.focus();
+        } else {
+            verifyOtpBtn.click();
+        }
+        return;
+    }
+    
     console.log('📝 Form submission started...');
     
     // Disable submit button
@@ -395,11 +726,29 @@ form.addEventListener('submit', async (e) => {
             // Clear saved form data on successful submission
             clearFormData();
             
+            // Clear OTP verification
+            sessionStorage.removeItem('verified_phone');
+            isOtpVerified = false;
+            otpSection.classList.remove('active');
+            otpInput.value = '';
+            otpInput.disabled = false;
+            verifyOtpBtn.disabled = false;
+            otpSuccess.style.display = 'none';
+            sendOtpBtn.style.display = 'none';
+            resendOtpBtn.style.display = 'none';
+            if (otpTimerInterval) {
+                clearInterval(otpTimerInterval);
+                otpTimerInterval = null;
+            }
+            otpTimer.textContent = '';
+            otpError.textContent = '';
+            
             // Reset form after 3 seconds
             setTimeout(() => {
                 form.reset();
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit & Proceed to Payment';
+                updateFormSubmissionState();
             }, 3000);
         } else {
             showMessage(`❌ Error: ${result.message || 'Failed to submit form. Please try again.'}`, 'error');
@@ -419,6 +768,26 @@ form.addEventListener('submit', async (e) => {
 window.addEventListener('DOMContentLoaded', async () => {
     // Restore saved form data first
     restoreFormData();
+    
+    // Check if mobile number was previously verified
+    setTimeout(() => {
+        const phoneNumber = mobileInput.value.trim();
+        if (phoneNumber.length === 10 && /^[0-9]{10}$/.test(phoneNumber)) {
+            const verifiedPhone = sessionStorage.getItem('verified_phone');
+            if (verifiedPhone === phoneNumber) {
+                isOtpVerified = true;
+                otpSection.classList.add('active');
+                otpSuccess.style.display = 'block';
+                otpInput.disabled = true;
+                verifyOtpBtn.disabled = true;
+                sendOtpBtn.style.display = 'none';
+                resendOtpBtn.style.display = 'none';
+                updateFormSubmissionState();
+            } else {
+                sendOtpBtn.style.display = 'block';
+            }
+        }
+    }, 100);
     
     // Test backend connection
     try {
