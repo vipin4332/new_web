@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tenx Registration Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #ffe6ec;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 900px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 25px 35px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        margin-top: 35px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-top: 12px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    textarea { resize: vertical; }
+
+    .row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .col { flex: 1; }
+
+    .upload-box {
+        border: 2px dashed #bbb;
+        border-radius: 6px;
+        padding: 25px;
+        text-align: center;
+        background: #fafafa;
+        margin-top: 10px;
+    }
+
+    .submit-btn {
+        margin-top: 25px;
+        padding: 14px 24px;
+        background: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .note {
+        color: red;
+        margin-top: 12px;
+        font-weight: bold;
+    }
+
+    .message {
+        padding: 12px;
+        margin-top: 15px;
+        border-radius: 6px;
+        display: none;
+    }
+
+    .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .message.show {
+        display: block;
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+</head>
+
+<body>
+<form id="registrationForm" method="POST" enctype="multipart/form-data">
+<div class="container">
+
+    <h2>PERSONAL DETAILS</h2>
+
+    <div class="row">
+        <div class="col">
+            <label>Gender *</label>
+            <select name="gender" required>
+                <option value="">Select Your Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <label>Mobile Number *</label>
+            <input type="text" name="mobile" required placeholder="Your Mobile Number">
+        </div>
+
+        <div class="col">
+            <label>Date of Birth *</label>
+            <div class="row">
+                <div class="col">
+                    <select name="dob_month" required>
+                        <option value="">MM</option>
+                        <option>01</option><option>02</option><option>03</option>
+                        <option>04</option><option>05</option><option>06</option>
+                        <option>07</option><option>08</option><option>09</option>
+                        <option>10</option><option>11</option><option>12</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="dob_day" required>
+                        <option value="">DD</option>
+                        <!-- 1 to 31 -->
+                        <option>01</option><option>02</option><option>03</option>
+                        <option>04</option><option>05</option><option>06</option>
+                        <option>07</option><option>08</option><option>09</option>
+                        <option>10</option><option>11</option><option>12</option>
+                        <option>13</option><option>14</option><option>15</option>
+                        <option>16</option><option>17</option><option>18</option>
+                        <option>19</option><option>20</option><option>21</option>
+                        <option>22</option><option>23</option><option>24</option>
+                        <option>25</option><option>26</option><option>27</option>
+                        <option>28</option><option>29</option><option>30</option>
+                        <option>31</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="dob_year" required>
+                        <option value="">YYYY</option>
+                        <option>1990</option><option>1991</option><option>1992</option>
+                        <option>1993</option><option>1994</option><option>1995</option>
+                        <option>1996</option><option>1997</option><option>1998</option>
+                        <option>1999</option><option>2000</option><option>2001</option>
+                        <option>2002</option><option>2003</option><option>2004</option>
+                        <option>2005</option><option>2006</option><option>2007</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label>Marital Status *</label>
+            <select name="marital_status" required>
+                <option value="">Select An Option</option>
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <label>WhatsApp Number *</label>
+            <input type="text" name="whatsapp" required placeholder="Your WhatsApp Number">
+        </div>
+
+        <div class="col">
+            <label>Email *</label>
+            <input type="email" name="email" required placeholder="Enter your email">
+            <label>Confirm Email *</label>
+            <input type="email" name="confirm_email" required placeholder="Re-enter your email">
+        </div>
+    </div>
+
+    <label>Applicant Name *</label>
+    <input type="text" name="applicant_name" required>
+
+    <label>Father's Name *</label>
+    <input type="text" name="father_name" required>
+
+    <label>State *</label>
+    <input type="text" name="state" required>
+
+    <label>Residential Address *</label>
+    <textarea name="address" rows="3" required></textarea>
+
+    <h2>ACADEMIC PROFILE</h2>
+
+    <label>Education *</label>
+    <select name="education" required>
+        <option value="">Select Education</option>
+        <option>10th</option>
+        <option>12th</option>
+        <option>Diploma</option>
+        <option>Graduate</option>
+        <option>Post Graduate</option>
+        <option>PhD</option>
+    </select>
+
+    <label>Qualification *</label>
+    <textarea name="qualification" rows="4" required></textarea>
+
+    <h2>APPLICATION PROFILE</h2>
+
+    <label>Applying For *</label>
+    <select name="applying_for" required>
+        <option value="">Select Your Designation</option>
+        <option>Teacher</option>
+        <option>Front Desk</option>
+        <option>Accountant</option>
+        <option>Lab Assistant</option>
+        <option>Computer Teacher</option>
+        <option>Sports Coach</option>
+        <option>Librarian</option>
+        <option>Driver</option>
+        <option>Nurse</option>
+        <option>Other</option>
+    </select>
+
+    <h2>EMPLOYEE PROFILE</h2>
+
+    <label>I am *</label>
+    <div>
+        <input type="radio" name="status" value="Fresher" required> Fresher &nbsp;&nbsp;&nbsp;
+        <input type="radio" name="status" value="Experienced"> Experienced
+    </div>
+
+    <label>Working Experience *</label>
+    <input type="text" name="experience" required placeholder="Exp. 7 Years">
+
+    <label>Current Employer Name *</label>
+    <input type="text" name="current_employer" required>
+
+    <label>Last Employer Name (If Any)</label>
+    <input type="text" name="last_employer">
+
+    <h2>SKILLS</h2>
+    <label>Skills *</label>
+    <textarea name="skills" rows="4" required></textarea>
+
+    <h2>SALARY</h2>
+    <div class="row">
+        <div class="col">
+            <label>Current Salary *</label>
+            <input type="text" name="current_salary" required>
+        </div>
+        <div class="col">
+            <label>Expected Salary *</label>
+            <input type="text" name="expected_salary" required>
+        </div>
+    </div>
+
+    <h2>UPLOAD DOCUMENTS</h2>
+
+    <label>Photograph *</label>
+    <div class="upload-box">
+        <input type="file" name="photo" accept="image/*" required>
+        <div>Max Size: 300 KB — JPG/PNG</div>
+    </div>
+
+    <label>Resume *</label>
+    <div class="upload-box">
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+        <div>Max Size: 500 KB — DOC/PDF</div>
+    </div>
+
+    <p class="note">A nominal application fee of ₹100 is required. Fully refundable upon joining.</p>
+
+    <div id="message" class="message"></div>
+
+    <button class="submit-btn" type="submit" id="submitBtn">Submit & Proceed to Payment</button>
+
+</div>
+</form>
+
+<script>
+const API_BASE_URL = 'http://localhost:5000';
+const form = document.getElementById('registrationForm');
+const submitBtn = document.getElementById('submitBtn');
+const messageDiv = document.getElementById('message');
+
+function showMessage(text, type = 'success') {
+    messageDiv.textContent = text;
+    messageDiv.className = `message ${type} show`;
+    setTimeout(() => {
+        messageDiv.classList.remove('show');
+    }, 5000);
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    console.log('📝 Form submission started...');
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    // Clear previous messages
+    messageDiv.classList.remove('show');
+    
+    try {
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Log form data (for debugging)
+        console.log('📋 Form data:', Object.fromEntries(formData));
+        
+        // Validate email match
+        const email = formData.get('email');
+        const confirmEmail = formData.get('confirm_email');
+        
+        if (email !== confirmEmail) {
+            showMessage('❌ Email addresses do not match!', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit & Proceed to Payment';
+            return;
+        }
+        
+        // Submit form
+        console.log('📤 Submitting to:', `${API_BASE_URL}/submit`);
+        
+        const response = await fetch(`${API_BASE_URL}/submit`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response headers:', response.headers);
+        
+        const result = await response.json();
+        console.log('📥 Response data:', result);
+        
+        if (response.ok && result.success) {
+            showMessage(`✅ ${result.message || 'Form submitted successfully!'}\n\nSubmission ID: ${result.id}\n\nYour application has been saved.`, 'success');
+            console.log('✅ Form submitted successfully!', result);
+            
+            // Reset form after 3 seconds
+            setTimeout(() => {
+                form.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit & Proceed to Payment';
+            }, 3000);
+        } else {
+            showMessage(`❌ Error: ${result.message || 'Failed to submit form. Please try again.'}`, 'error');
+            console.error('❌ Form submission failed:', result);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit & Proceed to Payment';
+        }
+    } catch (error) {
+        console.error('❌ Form submission error:', error);
+        showMessage(`❌ Error: ${error.message || 'Failed to submit form. Please check if the backend server is running.'}`, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit & Proceed to Payment';
+    }
+});
+
+// Test backend connection on page load
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        if (response.ok) {
+            console.log('✅ Backend server is running');
+        } else {
+            console.warn('⚠️ Backend server might not be running');
+            showMessage('⚠️ Warning: Backend server might not be running. Please make sure the server is started.', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Cannot connect to backend server:', error);
+        showMessage('❌ Error: Cannot connect to backend server. Please make sure the server is running at http://localhost:5000', 'error');
+    }
+});
+</script>
+</body>
+</html>
