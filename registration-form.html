@@ -104,12 +104,38 @@
         opacity: 0.6;
         cursor: not-allowed;
     }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #6c757d;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: background 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: #5a6268;
+    }
+
+    .back-btn:before {
+        content: "←";
+        font-size: 18px;
+    }
 </style>
 </head>
 
 <body>
 <form id="registrationForm" method="POST" enctype="multipart/form-data">
 <div class="container">
+    <a href="index.html" class="back-btn">Back to Main Site</a>
 
     <h2>PERSONAL DETAILS</h2>
 
@@ -304,6 +330,68 @@ const API_BASE_URL = 'http://localhost:5000';
 const form = document.getElementById('registrationForm');
 const submitBtn = document.getElementById('submitBtn');
 const messageDiv = document.getElementById('message');
+const STORAGE_KEY = 'tenx_registration_form_data';
+
+// Function to save form data to localStorage
+function saveFormData() {
+    const formData = new FormData(form);
+    const data = {};
+    
+    // Save all form fields except file inputs
+    for (let [key, value] of formData.entries()) {
+        const field = form.querySelector(`[name="${key}"]`);
+        // Skip file inputs as they can't be stored in localStorage
+        if (field && field.type !== 'file') {
+            data[key] = value;
+        }
+    }
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    console.log('💾 Form data saved to localStorage');
+}
+
+// Function to restore form data from localStorage
+function restoreFormData() {
+    try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            console.log('📂 Restoring form data from localStorage:', data);
+            
+            // Restore all form fields
+            Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if (field) {
+                    if (field.type === 'radio') {
+                        // Handle radio buttons
+                        const radio = form.querySelector(`[name="${key}"][value="${data[key]}"]`);
+                        if (radio) radio.checked = true;
+                    } else if (field.type === 'checkbox') {
+                        // Handle checkboxes
+                        field.checked = data[key] === 'on' || data[key] === true;
+                    } else {
+                        // Handle text, email, select, textarea
+                        field.value = data[key];
+                    }
+                }
+            });
+            
+            console.log('✅ Form data restored successfully');
+        }
+    } catch (error) {
+        console.error('❌ Error restoring form data:', error);
+    }
+}
+
+// Function to clear saved form data
+function clearFormData() {
+    localStorage.removeItem(STORAGE_KEY);
+    console.log('🗑️ Form data cleared from localStorage');
+}
+
+// Save form data whenever any field changes
+form.addEventListener('input', saveFormData);
+form.addEventListener('change', saveFormData);
 
 function showMessage(text, type = 'success') {
     messageDiv.textContent = text;
@@ -361,6 +449,9 @@ form.addEventListener('submit', async (e) => {
             showMessage(`✅ ${result.message || 'Form submitted successfully!'}\n\nSubmission ID: ${result.id}\n\nYour application has been saved.`, 'success');
             console.log('✅ Form submitted successfully!', result);
             
+            // Clear saved form data on successful submission
+            clearFormData();
+            
             // Reset form after 3 seconds
             setTimeout(() => {
                 form.reset();
@@ -381,8 +472,12 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
-// Test backend connection on page load
+// Restore form data and test backend connection on page load
 window.addEventListener('DOMContentLoaded', async () => {
+    // Restore saved form data first
+    restoreFormData();
+    
+    // Test backend connection
     try {
         const response = await fetch(`${API_BASE_URL}/health`);
         if (response.ok) {
