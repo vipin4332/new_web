@@ -201,17 +201,6 @@
 
     <div class="row">
         <div class="col">
-            <label>Marital Status *</label>
-            <select name="marital_status" required>
-                <option value="">Select An Option</option>
-                <option>Single</option>
-                <option>Married</option>
-                <option>Divorced</option>
-                <option>Widowed</option>
-            </select>
-        </div>
-
-        <div class="col">
             <label>WhatsApp Number *</label>
             <input type="text" name="whatsapp" required placeholder="Your WhatsApp Number">
         </div>
@@ -251,23 +240,6 @@
 
     <label>Qualification *</label>
     <textarea name="qualification" rows="4" required></textarea>
-
-    <h2>APPLICATION PROFILE</h2>
-
-    <label>Applying For *</label>
-    <select name="applying_for" required>
-        <option value="">Select Your Designation</option>
-        <option>Teacher</option>
-        <option>Front Desk</option>
-        <option>Accountant</option>
-        <option>Lab Assistant</option>
-        <option>Computer Teacher</option>
-        <option>Sports Coach</option>
-        <option>Librarian</option>
-        <option>Driver</option>
-        <option>Nurse</option>
-        <option>Other</option>
-    </select>
 
     <h2>EMPLOYEE PROFILE</h2>
 
@@ -310,10 +282,10 @@
         <div>Max Size: 300 KB — JPG/PNG</div>
     </div>
 
-    <label>Resume *</label>
+    <label>Upload Marksheet (10th/12th) *</label>
     <div class="upload-box">
-        <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
-        <div>Max Size: 500 KB — DOC/PDF</div>
+        <input type="file" name="marksheet" accept=".pdf,.jpg,.jpeg,.png" required>
+        <div>Max Size: 500 KB — PDF/JPG/PNG</div>
     </div>
 
     <p class="note">A nominal application fee of ₹100 is required. Fully refundable upon joining.</p>
