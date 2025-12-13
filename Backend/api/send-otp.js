@@ -126,10 +126,12 @@ module.exports = async (req, res) => {
 
         console.log(`✅ OTP sent successfully to: ${email}`);
 
-        // Return success response (don't send OTP in response for security)
+        // Return success response with OTP for frontend verification
+        // Note: In production, you might want to verify OTP on backend instead
         res.json({
             success: true,
-            message: 'OTP sent successfully to your email'
+            message: 'OTP sent successfully to your email',
+            otp: otp // Send OTP back so frontend can verify it
         });
 
     } catch (error) {

@@ -291,8 +291,6 @@
                 <button type="button" class="send-otp-btn" id="resendOtpBtn" style="margin-top: 10px; display: none;">Resend OTP</button>
             </div>
             <button type="button" class="send-otp-btn" id="sendOtpBtn" style="margin-top: 10px; display: none;">Send OTP to Email</button>
-            <label>Confirm Email *</label>
-            <input type="email" name="confirm_email" required placeholder="Re-enter your email">
         </div>
     </div>
 
@@ -417,15 +415,7 @@ function startOTPTimer() {
 // Send OTP via Email using Backend API (Brevo)
 async function sendOTP(email) {
     try {
-        // Generate OTP
-        otpGenerated = generateOTP();
-        otpExpiryTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
-        
-        // Store OTP in sessionStorage
-        sessionStorage.setItem('otp_' + email, otpGenerated);
-        sessionStorage.setItem('otp_expiry_' + email, otpExpiryTime.toString());
-        
-        // Send OTP request to backend API
+        // Send OTP request to backend API (backend will generate and send OTP)
         try {
             console.log('📤 Sending OTP request to:', `${API_BASE_URL}/api/send-otp`);
             console.log('📤 Request body:', { email: email });
@@ -447,9 +437,18 @@ async function sendOTP(email) {
             if (response.ok && result.success) {
                 console.log('✅ OTP email sent successfully to:', email);
                 
-                // In development mode, backend might return OTP for testing
+                // Get OTP from backend response and store it
                 if (result.otp) {
-                    console.log(`Development mode - OTP: ${result.otp}`);
+                    otpGenerated = result.otp;
+                    otpExpiryTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
+                    
+                    // Store OTP in sessionStorage for verification
+                    sessionStorage.setItem('otp_' + email, otpGenerated);
+                    sessionStorage.setItem('otp_expiry_' + email, otpExpiryTime.toString());
+                    
+                    console.log(`✅ OTP received from backend and stored`);
+                } else {
+                    throw new Error('OTP not received from backend');
                 }
             } else {
                 throw new Error(result.message || result.error || 'Failed to send OTP');
@@ -464,10 +463,7 @@ async function sendOTP(email) {
             
             // Show more detailed error
             otpError.textContent = `Failed to send OTP: ${apiError.message}. Check browser console (F12) for details.`;
-            
-            // Fallback: If backend is not available, show OTP in alert for testing
-            console.warn('⚠️ Backend not available. Showing OTP in alert for testing.');
-            alert(`Backend server error.\n\nError: ${apiError.message}\n\nFor testing, OTP is: ${otpGenerated}\n\nBackend URL: ${API_BASE_URL}/api/send-otp\n\nPlease check browser console (F12) for more details.`);
+            return false;
         }
         
         // Show OTP section
@@ -744,14 +740,6 @@ form.addEventListener('submit', async (e) => {
         
         // Validate email match
         const email = formData.get('email');
-        const confirmEmail = formData.get('confirm_email');
-        
-        if (email !== confirmEmail) {
-            showMessage('❌ Email addresses do not match!', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit & Proceed to Payment';
-            return;
-        }
         
         // Submit form
         console.log('📤 Submitting to:', `${API_BASE_URL}/api/submit`);
