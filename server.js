@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const brevo = require('@getbrevo/brevo');
+const axios = require('axios');
 
 // Load environment variables
 dotenv.config();
@@ -14,12 +14,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize Brevo API client
-let apiInstance = null;
-if (process.env.BREVO_API_KEY) {
-    apiInstance = new brevo.TransactionalEmailsApi();
-    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
-}
+// Brevo API configuration
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -44,7 +41,7 @@ app.post('/send-otp', async (req, res) => {
         }
 
         // Check if Brevo is configured
-        if (!process.env.BREVO_API_KEY || !apiInstance) {
+        if (!BREVO_API_KEY) {
             return res.status(500).json({
                 success: false,
                 message: 'Email service is not configured. Please set BREVO_API_KEY in environment variables.'
@@ -106,8 +103,13 @@ app.post('/send-otp', async (req, res) => {
             textContent: `Your Tenx Registration OTP is: ${otp}\n\nThis OTP will expire in 5 minutes.\n\nIf you didn't request this OTP, please ignore this email.`
         };
 
-        // Send email using Brevo
-        await apiInstance.sendTransacEmail(emailData);
+        // Send email using Brevo API
+        await axios.post(BREVO_API_URL, emailData, {
+            headers: {
+                'api-key': BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        });
 
         console.log(`✅ OTP sent successfully to: ${email}`);
 
@@ -127,8 +129,8 @@ app.post('/send-otp', async (req, res) => {
         if (error.response) {
             return res.status(error.response.status || 500).json({
                 success: false,
-                message: error.response.body?.message || 'Failed to send OTP email',
-                error: process.env.NODE_ENV === 'development' ? error.response.body : undefined
+                message: error.response.data?.message || 'Failed to send OTP email',
+                error: process.env.NODE_ENV === 'development' ? error.response.data : undefined
             });
         }
 
