@@ -107,6 +107,16 @@ module.exports = async (req, res) => {
         };
 
         // Send email using Brevo API
+        if (!BREVO_API_KEY) {
+            return res.status(500).json({
+                success: false,
+                message: 'Brevo API key is not configured. Please set BREVO_API_KEY in Vercel environment variables.'
+            });
+        }
+
+        console.log('📧 Sending email via Brevo to:', email);
+        console.log('📧 Using sender email:', senderEmail);
+        
         await axios.post(BREVO_API_URL, emailData, {
             headers: {
                 'api-key': BREVO_API_KEY,
