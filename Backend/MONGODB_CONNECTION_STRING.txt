@@ -5,6 +5,7 @@ Your Credentials:
 - Username: vs9953682@_db_user
 - Password: fYuMLJcGRCIVG54c
 
+
 STEP 1: Get your cluster URL from MongoDB Atlas
 ------------------------------------------------
 1. Go to https://cloud.mongodb.com
