@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Tenx Registration Form</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EmailJS SDK for sending emails -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
     body {
@@ -352,6 +354,27 @@
 </form>
 
 <script>
+/*
+ * EMAILJS SETUP INSTRUCTIONS:
+ * 
+ * 1. Go to https://www.emailjs.com/ and create a free account (200 emails/month free)
+ * 2. Create an Email Service (Gmail, Outlook, etc.)
+ * 3. Create an Email Template with these variables:
+ *    - {{to_email}} - recipient email
+ *    - {{otp_code}} - the OTP code
+ *    - {{subject}} - email subject
+ *    - {{message}} - email message
+ * 4. Get your Service ID, Template ID, and Public Key from EmailJS dashboard
+ * 5. Replace the values below:
+ *    - EMAILJS_SERVICE_ID
+ *    - EMAILJS_TEMPLATE_ID
+ *    - EMAILJS_PUBLIC_KEY
+ * 
+ * Example Email Template:
+ * Subject: {{subject}}
+ * Body: Hello, Your OTP is: {{otp_code}} {{message}}
+ */
+
 const API_BASE_URL = 'http://localhost:5000';
 const form = document.getElementById('registrationForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -405,27 +428,52 @@ function startOTPTimer() {
     otpTimer.textContent = `OTP expires in: ${formatTime(timeLeft)}`;
 }
 
-// Send OTP via Email (In production, this would call your backend API)
+// EmailJS Configuration
+// TODO: Replace these with your EmailJS credentials
+// Get them from: https://www.emailjs.com/
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // Replace with your EmailJS service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // Replace with your EmailJS template ID
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY'; // Replace with your EmailJS public key
+
+// Initialize EmailJS (only if credentials are set)
+if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+}
+
+// Send OTP via Email using EmailJS
 async function sendOTP(email) {
     try {
         // Generate OTP
         otpGenerated = generateOTP();
         otpExpiryTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
         
-        // Store OTP in sessionStorage (in production, backend would send email)
+        // Store OTP in sessionStorage
         sessionStorage.setItem('otp_' + email, otpGenerated);
         sessionStorage.setItem('otp_expiry_' + email, otpExpiryTime.toString());
         
-        // In production, you would call your backend API here:
-        // const response = await fetch(`${API_BASE_URL}/send-email-otp`, {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ email: email })
-        // });
-        
-        // For demo purposes, show OTP in console and alert
-        console.log(`OTP for ${email}: ${otpGenerated}`);
-        alert(`OTP sent to ${email}!\n\nFor demo: OTP is ${otpGenerated}\n(In production, this would be sent via email)`);
+        // Check if EmailJS is configured
+        if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY' || EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID') {
+            // EmailJS not configured - show OTP in alert for testing
+            console.log(`OTP for ${email}: ${otpGenerated}`);
+            alert(`OTP sent to ${email}!\n\nOTP: ${otpGenerated}\n\nNote: Please configure EmailJS to send real emails. See instructions in code comments.`);
+        } else {
+            // Send email using EmailJS
+            try {
+                const templateParams = {
+                    to_email: email,
+                    otp_code: otpGenerated,
+                    subject: 'Your Tenx Registration OTP',
+                    message: `Your OTP for Tenx registration is: ${otpGenerated}\n\nThis OTP will expire in 5 minutes.\n\nIf you didn't request this OTP, please ignore this email.`
+                };
+                
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                console.log('✅ OTP email sent successfully to:', email);
+            } catch (emailError) {
+                console.error('EmailJS error:', emailError);
+                // Fallback: show OTP in alert if email fails
+                alert(`Failed to send email. OTP: ${otpGenerated}\n\nPlease check EmailJS configuration.`);
+            }
+        }
         
         // Show OTP section
         otpSection.classList.add('active');
