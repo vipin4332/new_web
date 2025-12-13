@@ -22,14 +22,30 @@ async function connectToDatabase() {
 
     try {
         console.log('🔌 Connecting to MongoDB...');
+        console.log('🔌 MongoDB URI configured:', !!MONGODB_URI);
+        console.log('🔌 MongoDB DB:', MONGODB_DB);
+        
         const client = new MongoClient(MONGODB_URI, {
             maxPoolSize: 10,
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 10000, // Increased timeout
             socketTimeoutMS: 45000,
+            connectTimeoutMS: 10000,
+            tls: true,
+            tlsAllowInvalidCertificates: false,
+            tlsAllowInvalidHostnames: false,
+            retryWrites: true,
+            retryReads: true
         });
 
+        console.log('🔌 Attempting MongoDB connection...');
         await client.connect();
+        console.log('🔌 MongoDB client connected, accessing database...');
+        
         const db = client.db(MONGODB_DB);
+        
+        // Test the connection with a ping
+        await db.admin().ping();
+        console.log('✅ MongoDB ping successful');
 
         cachedClient = client;
         cachedDb = db;
@@ -38,6 +54,14 @@ async function connectToDatabase() {
         return { client, db };
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
+        console.error('❌ Error name:', error.name);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error code:', error.code);
+        
+        // Clear cache on error
+        cachedClient = null;
+        cachedDb = null;
+        
         throw error;
     }
 }
