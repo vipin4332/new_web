@@ -614,25 +614,66 @@ emailInput.addEventListener('input', function() {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && emailRegex.test(email)) {
+        // Always show send OTP button - allow re-verification every time
         sendOtpBtn.style.display = 'block';
         
-        // Check if OTP was already verified for this email
-        const verifiedEmail = sessionStorage.getItem('verified_email');
-        if (verifiedEmail === email) {
-            isOtpVerified = true;
-            otpSection.classList.add('active');
-            otpSuccess.style.display = 'block';
-            otpInput.disabled = true;
-            verifyOtpBtn.disabled = true;
-            sendOtpBtn.style.display = 'none';
-            resendOtpBtn.style.display = 'none';
-            updateFormSubmissionState();
-        } else {
+        // Reset verification status when email changes
+        const currentVerifiedEmail = sessionStorage.getItem('verified_email');
+        if (currentVerifiedEmail !== email) {
+            // Email changed - reset verification
             isOtpVerified = false;
             otpSection.classList.remove('active');
             otpSuccess.style.display = 'none';
-            updateFormSubmissionState();
+            otpInput.value = '';
+            otpInput.disabled = false;
+            verifyOtpBtn.disabled = false;
+            resendOtpBtn.style.display = 'none';
+            otpError.textContent = '';
+            otpTimer.textContent = '';
+            
+            // Clear any existing timer
+            if (otpTimerInterval) {
+                clearInterval(otpTimerInterval);
+                otpTimerInterval = null;
+            }
+        } else {
+            // Same email - check if OTP was sent but not verified
+            const storedOtp = sessionStorage.getItem('otp_' + email);
+            const storedExpiry = sessionStorage.getItem('otp_expiry_' + email);
+            
+            if (storedOtp && storedExpiry) {
+                const expiryTime = parseInt(storedExpiry);
+                const now = Date.now();
+                
+                if (now > expiryTime) {
+                    // OTP expired
+                    otpSection.classList.add('active');
+                    sendOtpBtn.style.display = 'block';
+                    resendOtpBtn.style.display = 'none';
+                    otpTimer.textContent = 'OTP expired. Please send a new one.';
+                    otpTimer.style.color = 'red';
+                    isOtpVerified = false;
+                } else {
+                    // OTP still valid - show OTP section
+                    otpSection.classList.add('active');
+                    sendOtpBtn.style.display = 'none';
+                    resendOtpBtn.style.display = 'none';
+                    otpGenerated = storedOtp;
+                    otpExpiryTime = expiryTime;
+                    isOtpVerified = false;
+                    
+                    // Restart timer
+                    if (otpTimerInterval) clearInterval(otpTimerInterval);
+                    startOTPTimer();
+                }
+            } else {
+                // No OTP sent yet
+                isOtpVerified = false;
+                otpSection.classList.remove('active');
+                otpSuccess.style.display = 'none';
+            }
         }
+        updateFormSubmissionState();
     } else {
         sendOtpBtn.style.display = 'none';
         otpSection.classList.remove('active');
@@ -885,37 +926,28 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Restore saved form data first
     restoreFormData();
     
-    // Check if email was previously verified or OTP was sent
+    // Check if OTP was sent (but always allow re-verification)
     setTimeout(() => {
         const email = emailInput.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (email && emailRegex.test(email)) {
-            const verifiedEmail = sessionStorage.getItem('verified_email');
             const storedOtp = sessionStorage.getItem('otp_' + email);
             const storedExpiry = sessionStorage.getItem('otp_expiry_' + email);
             
-            if (verifiedEmail === email) {
-                // Email was previously verified
-                isOtpVerified = true;
-                otpSection.classList.add('active');
-                otpSuccess.style.display = 'block';
-                otpInput.disabled = true;
-                verifyOtpBtn.disabled = true;
-                sendOtpBtn.style.display = 'none';
-                resendOtpBtn.style.display = 'none';
-                updateFormSubmissionState();
-            } else if (storedOtp && storedExpiry) {
+            // Always show send OTP button - allow re-verification
+            sendOtpBtn.style.display = 'block';
+            isOtpVerified = false; // Reset verification status
+            
+            if (storedOtp && storedExpiry) {
                 // OTP was sent but not verified - check if expired
                 const expiryTime = parseInt(storedExpiry);
                 const now = Date.now();
                 
                 if (now > expiryTime) {
-                    // OTP expired - show resend button
-                    otpSection.classList.add('active');
-                    sendOtpBtn.style.display = 'none';
-                    resendOtpBtn.style.display = 'block';
-                    otpTimer.textContent = 'OTP expired. Please resend.';
-                    otpTimer.style.color = 'red';
+                    // OTP expired - show send button
+                    otpSection.classList.remove('active');
+                    sendOtpBtn.style.display = 'block';
+                    resendOtpBtn.style.display = 'none';
                     isOtpVerified = false;
                 } else {
                     // OTP still valid - show OTP section with timer
@@ -930,12 +962,13 @@ window.addEventListener('DOMContentLoaded', async () => {
                     if (otpTimerInterval) clearInterval(otpTimerInterval);
                     startOTPTimer();
                 }
-                updateFormSubmissionState();
             } else {
-                // No OTP sent yet - show send button
+                // No OTP sent yet - just show send button
+                otpSection.classList.remove('active');
                 sendOtpBtn.style.display = 'block';
                 resendOtpBtn.style.display = 'none';
             }
+            updateFormSubmissionState();
         }
     }, 100);
     
