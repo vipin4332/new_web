@@ -115,12 +115,5 @@ function generateAdmitCardPDF(userData, rollNumber) {
     });
 }
 
-function formatDate(day, month, year) {
-    if (!day || !month || !year) return 'N/A';
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                   'July', 'August', 'September', 'October', 'November', 'December'];
-    return `${day} ${months[parseInt(month) - 1] || month}, ${year}`;
-}
-
 module.exports = { generateAdmitCardPDF };
 
