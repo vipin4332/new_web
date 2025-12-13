@@ -1,4 +1,6 @@
-// Health check endpoint for Vercel
+// Health check endpoint for Vercel with MongoDB connection test
+const { connectToDatabase } = require('./lib/mongodb');
+
 module.exports = async (req, res) => {
     try {
         // Set CORS headers
@@ -28,21 +30,45 @@ module.exports = async (req, res) => {
         // Check environment variables
         const brevoConfigured = !!process.env.BREVO_API_KEY;
         const senderEmailConfigured = !!process.env.BREVO_SENDER_EMAIL;
+        const mongodbUriConfigured = !!process.env.MONGODB_URI;
+        const mongodbDbConfigured = !!process.env.MONGODB_DB;
+
+        // Test MongoDB connection
+        let mongodbStatus = 'not_configured';
+        let mongodbError = null;
+        
+        if (mongodbUriConfigured) {
+            try {
+                const { db } = await connectToDatabase();
+                // Try to ping the database
+                await db.admin().ping();
+                mongodbStatus = 'connected';
+                console.log('✅ MongoDB connection test successful');
+            } catch (mongoError) {
+                mongodbStatus = 'error';
+                mongodbError = mongoError.message;
+                console.error('❌ MongoDB connection test failed:', mongoError);
+            }
+        }
 
         // Return health status
-        res.status(200).json({
+        return res.status(200).json({
             status: 'ok',
             message: 'Server is running',
             timestamp: new Date().toISOString(),
             environment: {
                 brevoConfigured: brevoConfigured,
                 senderEmailConfigured: senderEmailConfigured,
+                mongodbUriConfigured: mongodbUriConfigured,
+                mongodbDbConfigured: mongodbDbConfigured,
+                mongodbStatus: mongodbStatus,
+                mongodbError: mongodbError,
                 nodeEnv: process.env.NODE_ENV || 'production'
             }
         });
     } catch (error) {
         console.error('❌ Health check error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             status: 'error',
             message: 'Health check failed',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined

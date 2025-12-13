@@ -176,6 +176,7 @@ module.exports = async (req, res) => {
         console.log('📧 Sending email via Brevo to:', email);
         console.log('📧 Using sender email:', senderEmail);
         console.log('📧 Brevo API URL:', BREVO_API_URL);
+        console.log('📧 Generated OTP:', otp);
         
         // Send email using Brevo API
         const brevoResponse = await axios.post(BREVO_API_URL, emailData, {
@@ -183,11 +184,12 @@ module.exports = async (req, res) => {
                 'api-key': BREVO_API_KEY,
                 'Content-Type': 'application/json'
             },
-            timeout: 10000 // 10 second timeout
+            timeout: 30000 // 30 second timeout for email sending
         });
 
         console.log(`✅ OTP sent successfully to: ${email}`);
         console.log('✅ Brevo response status:', brevoResponse.status);
+        console.log('✅ Brevo response data:', brevoResponse.data);
 
         // Return success response with OTP for frontend verification
         // Note: In production, you might want to verify OTP on backend instead
