@@ -342,7 +342,7 @@
 
     <div id="message" class="message"></div>
 
-    <button class="submit-btn" type="submit" id="submitBtn">Submit & Proceed to Payment</button>
+    <button class="submit-btn" type="submit" id="submitBtn">Submit Registration</button>
 
 </div>
 </form>
@@ -921,7 +921,7 @@ form.addEventListener('submit', async (e) => {
             setTimeout(() => {
                 form.reset();
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit & Proceed to Payment';
+                submitBtn.textContent = 'Submit Registration';
                 updateFormSubmissionState();
             }, 3000);
         } else {
