@@ -394,18 +394,37 @@ function formatTime(seconds) {
 
 // Start OTP timer (5 minutes = 300 seconds)
 function startOTPTimer() {
-    let timeLeft = 300; // 5 minutes
+    let timeLeft;
+    
+    // Calculate remaining time if OTP was already sent
+    if (otpExpiryTime) {
+        const now = Date.now();
+        timeLeft = Math.max(0, Math.floor((otpExpiryTime - now) / 1000));
+    } else {
+        timeLeft = 300; // 5 minutes
+    }
+    
+    // If already expired, show resend button immediately
+    if (timeLeft <= 0) {
+        otpTimer.textContent = 'OTP expired. Please resend.';
+        otpTimer.style.color = 'red';
+        resendOtpBtn.style.display = 'block';
+        sendOtpBtn.style.display = 'none';
+        return;
+    }
     
     otpTimerInterval = setInterval(() => {
         timeLeft--;
         otpTimer.textContent = `OTP expires in: ${formatTime(timeLeft)}`;
+        otpTimer.style.color = '';
         
         if (timeLeft <= 0) {
             clearInterval(otpTimerInterval);
-            otpTimer.textContent = 'OTP has expired. Please request a new one.';
-            otpTimer.classList.add('expired');
+            otpTimer.textContent = 'OTP expired. Please resend.';
+            otpTimer.style.color = 'red';
             otpGenerated = null;
             resendOtpBtn.style.display = 'block';
+            sendOtpBtn.style.display = 'none';
         }
     }, 1000);
     
