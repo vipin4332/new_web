@@ -6,38 +6,76 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 // Send OTP via Email using Brevo
 module.exports = async (req, res) => {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Handle OPTIONS request
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    // Only allow POST requests
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
     try {
-        const { email } = req.body;
+        // Set CORS headers
+        res.setHeader('Access-Control-Allow-Credentials', true);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-        // Validate email
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        // Handle OPTIONS request
+        if (req.method === 'OPTIONS') {
+            res.status(200).end();
+            return;
+        }
+
+        // Only allow POST requests
+        if (req.method !== 'POST') {
+            return res.status(405).json({ 
+                status: 'error',
+                error: 'Method not allowed',
+                message: 'Only POST requests are allowed'
+            });
+        }
+
+        // Log request
+        console.log('📧 OTP request received at:', new Date().toISOString());
+        console.log('📧 Request method:', req.method);
+        console.log('📧 Request body:', req.body);
+
+        // Parse request body
+        let email;
+        try {
+            if (typeof req.body === 'string') {
+                const parsed = JSON.parse(req.body);
+                email = parsed.email;
+            } else {
+                email = req.body?.email;
+            }
+        } catch (parseError) {
+            console.error('❌ Error parsing request body:', parseError);
             return res.status(400).json({
                 success: false,
+                status: 'error',
+                message: 'Invalid request body. Expected JSON with email field.'
+            });
+        }
+
+        // Validate email
+        if (!email) {
+            console.error('❌ Email is missing in request');
+            return res.status(400).json({
+                success: false,
+                status: 'error',
+                message: 'Email address is required'
+            });
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            console.error('❌ Invalid email format:', email);
+            return res.status(400).json({
+                success: false,
+                status: 'error',
                 message: 'Valid email address is required'
             });
         }
 
         // Check if Brevo is configured
         if (!BREVO_API_KEY) {
+            console.error('❌ BREVO_API_KEY is not configured');
             return res.status(500).json({
                 success: false,
+                status: 'error',
                 message: 'Email service is not configured. Please set BREVO_API_KEY in environment variables.'
             });
         }
@@ -45,14 +83,17 @@ module.exports = async (req, res) => {
         // Check if sender email is configured
         const senderEmail = process.env.BREVO_SENDER_EMAIL;
         if (!senderEmail || senderEmail === 'noreply@tenx.com') {
+            console.error('❌ BREVO_SENDER_EMAIL is not configured or invalid:', senderEmail);
             return res.status(400).json({
                 success: false,
+                status: 'error',
                 message: 'Valid sender email required. Please set BREVO_SENDER_EMAIL in Vercel environment variables and verify the email in Brevo.'
             });
         }
 
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log('🔐 Generated OTP for:', email);
 
         // Email content
         const emailData = {
@@ -106,56 +147,79 @@ module.exports = async (req, res) => {
             textContent: `Your Tenx Registration OTP is: ${otp}\n\nThis OTP will expire in 5 minutes.\n\nIf you didn't request this OTP, please ignore this email.`
         };
 
-        // Send email using Brevo API
-        if (!BREVO_API_KEY) {
-            return res.status(500).json({
-                success: false,
-                message: 'Brevo API key is not configured. Please set BREVO_API_KEY in Vercel environment variables.'
-            });
-        }
-
         console.log('📧 Sending email via Brevo to:', email);
         console.log('📧 Using sender email:', senderEmail);
+        console.log('📧 Brevo API URL:', BREVO_API_URL);
         
-        await axios.post(BREVO_API_URL, emailData, {
+        // Send email using Brevo API
+        const brevoResponse = await axios.post(BREVO_API_URL, emailData, {
             headers: {
                 'api-key': BREVO_API_KEY,
                 'Content-Type': 'application/json'
-            }
+            },
+            timeout: 10000 // 10 second timeout
         });
 
         console.log(`✅ OTP sent successfully to: ${email}`);
+        console.log('✅ Brevo response status:', brevoResponse.status);
 
         // Return success response with OTP for frontend verification
         // Note: In production, you might want to verify OTP on backend instead
-        res.json({
+        return res.status(200).json({
             success: true,
+            status: 'ok',
             message: 'OTP sent successfully to your email',
             otp: otp // Send OTP back so frontend can verify it
         });
 
     } catch (error) {
         console.error('❌ Error sending OTP:', error);
+        console.error('❌ Error details:', {
+            message: error.message,
+            code: error.code,
+            response: error.response ? {
+                status: error.response.status,
+                data: error.response.data
+            } : null,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
         
         // Handle Brevo API errors
         if (error.response) {
             const errorMessage = error.response.data?.message || 'Failed to send OTP email';
+            const errorCode = error.response.data?.code;
             
             // Provide helpful error messages
             let userMessage = errorMessage;
-            if (errorMessage.includes('sender') || errorMessage.includes('email')) {
+            if (errorMessage.includes('sender') || errorMessage.includes('email') || errorCode === 'invalid_parameter') {
                 userMessage = 'Sender email not verified. Please verify your sender email in Brevo dashboard and set BREVO_SENDER_EMAIL in Vercel environment variables.';
+            } else if (errorMessage.includes('authentication') || errorCode === 'unauthorized') {
+                userMessage = 'Brevo API key is invalid or not set. Please check BREVO_API_KEY in Vercel environment variables.';
+            } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+                userMessage = 'Request timeout. Please try again later.';
             }
             
             return res.status(error.response.status || 500).json({
                 success: false,
+                status: 'error',
                 message: userMessage,
                 error: process.env.NODE_ENV === 'development' ? error.response.data : undefined
             });
         }
 
-        res.status(500).json({
+        // Handle network errors
+        if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+            return res.status(503).json({
+                success: false,
+                status: 'error',
+                message: 'Email service is temporarily unavailable. Please try again later.'
+            });
+        }
+
+        // Generic error
+        return res.status(500).json({
             success: false,
+            status: 'error',
             message: 'Failed to send OTP. Please try again later.',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
