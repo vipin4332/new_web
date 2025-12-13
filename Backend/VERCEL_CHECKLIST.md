@@ -1,5 +1,6 @@
 # Vercel Deployment Checklist
 
+
 ## ✅ What You've Confirmed:
 - Functions Settings page is accessible
 - Fluid Compute is enabled
