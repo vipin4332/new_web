@@ -33,16 +33,23 @@ module.exports = async (req, res) => {
         const mongodbUriConfigured = !!process.env.MONGODB_URI;
         const mongodbDbConfigured = !!process.env.MONGODB_DB;
 
-        // Test MongoDB connection
+        // Test MongoDB connection (with timeout to avoid blocking)
         let mongodbStatus = 'not_configured';
         let mongodbError = null;
         
         if (mongodbUriConfigured) {
             try {
-                const { db } = await connectToDatabase();
-                // Try to ping the database
-                await db.admin().ping();
-                mongodbStatus = 'connected';
+                // Use Promise.race to timeout after 5 seconds
+                const connectionPromise = connectToDatabase().then(async ({ db }) => {
+                    await db.admin().ping();
+                    return 'connected';
+                });
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Connection timeout')), 5000)
+                );
+                
+                mongodbStatus = await Promise.race([connectionPromise, timeoutPromise]);
                 console.log('✅ MongoDB connection test successful');
             } catch (mongoError) {
                 mongodbStatus = 'error';

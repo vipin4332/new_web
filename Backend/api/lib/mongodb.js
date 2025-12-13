@@ -27,12 +27,9 @@ async function connectToDatabase() {
         
         const client = new MongoClient(MONGODB_URI, {
             maxPoolSize: 10,
-            serverSelectionTimeoutMS: 10000, // Increased timeout
+            serverSelectionTimeoutMS: 5000, // 5 second timeout
             socketTimeoutMS: 45000,
-            connectTimeoutMS: 10000,
-            tls: true,
-            tlsAllowInvalidCertificates: false,
-            tlsAllowInvalidHostnames: false,
+            connectTimeoutMS: 5000,
             retryWrites: true,
             retryReads: true
         });
