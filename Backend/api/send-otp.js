@@ -42,6 +42,15 @@ module.exports = async (req, res) => {
             });
         }
 
+        // Check if sender email is configured
+        const senderEmail = process.env.BREVO_SENDER_EMAIL;
+        if (!senderEmail || senderEmail === 'noreply@tenx.com') {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid sender email required. Please set BREVO_SENDER_EMAIL in Vercel environment variables and verify the email in Brevo.'
+            });
+        }
+
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -49,7 +58,7 @@ module.exports = async (req, res) => {
         const emailData = {
             sender: {
                 name: process.env.BREVO_SENDER_NAME || 'Tenx Registration',
-                email: process.env.BREVO_SENDER_EMAIL || 'noreply@tenx.com'
+                email: senderEmail
             },
             to: [{
                 email: email
@@ -118,9 +127,17 @@ module.exports = async (req, res) => {
         
         // Handle Brevo API errors
         if (error.response) {
+            const errorMessage = error.response.data?.message || 'Failed to send OTP email';
+            
+            // Provide helpful error messages
+            let userMessage = errorMessage;
+            if (errorMessage.includes('sender') || errorMessage.includes('email')) {
+                userMessage = 'Sender email not verified. Please verify your sender email in Brevo dashboard and set BREVO_SENDER_EMAIL in Vercel environment variables.';
+            }
+            
             return res.status(error.response.status || 500).json({
                 success: false,
-                message: error.response.data?.message || 'Failed to send OTP email',
+                message: userMessage,
                 error: process.env.NODE_ENV === 'development' ? error.response.data : undefined
             });
         }
