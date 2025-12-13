@@ -117,7 +117,9 @@ module.exports = async (req, res) => {
         const { db } = await connectToDatabase();
         const registrationsCollection = db.collection('registrations');
 
-        // Check if email already exists
+        // Check if email already exists (optional - you can remove this if you want to allow multiple registrations)
+        // Uncomment below if you want to prevent duplicate registrations
+        /*
         const existingRegistration = await registrationsCollection.findOne({ email: formData.email });
         if (existingRegistration) {
             console.warn('⚠️ Email already registered:', formData.email);
@@ -127,6 +129,7 @@ module.exports = async (req, res) => {
                 message: 'This email is already registered'
             });
         }
+        */
 
         // Insert registration data
         const insertResult = await registrationsCollection.insertOne(registrationData);

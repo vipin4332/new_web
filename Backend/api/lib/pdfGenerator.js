@@ -43,57 +43,50 @@ function generateAdmitCardPDF(userData, rollNumber) {
 
             doc.moveDown(2);
 
-            // Personal Information Section
-            doc.fontSize(14)
+            // Admit Card Information Section (Simplified)
+            doc.fontSize(16)
                .font('Helvetica-Bold')
-               .text('PERSONAL INFORMATION', 70, doc.y);
+               .text('ADMIT CARD INFORMATION', 70, doc.y, { align: 'center', width: 450 });
             
-            doc.moveDown(0.5);
-            doc.fontSize(10)
-               .font('Helvetica')
-               .text(`Name: ${userData.applicant_name || 'N/A'}`, 70, doc.y)
-               .text(`Father's Name: ${userData.father_name || 'N/A'}`, 70, doc.y + 15)
-               .text(`Date of Birth: ${formatDate(userData.dob_day, userData.dob_month, userData.dob_year)}`, 70, doc.y + 15)
-               .text(`Gender: ${userData.gender || 'N/A'}`, 70, doc.y + 15)
-               .text(`Mobile: ${userData.mobile || 'N/A'}`, 70, doc.y + 15)
-               .text(`WhatsApp: ${userData.whatsapp || 'N/A'}`, 70, doc.y + 15)
-               .text(`Email: ${userData.email || 'N/A'}`, 70, doc.y + 15);
-
             doc.moveDown(1.5);
-
-            // Address Section
-            doc.fontSize(14)
-               .font('Helvetica-Bold')
-               .text('ADDRESS', 70, doc.y);
             
-            doc.moveDown(0.5);
-            doc.fontSize(10)
-               .font('Helvetica')
-               .text(`Address: ${userData.address || 'N/A'}`, 70, doc.y, {
-                   width: 450,
-                   lineGap: 5
-               })
-               .text(`State: ${userData.state || 'N/A'}`, 70, doc.y + 5);
-
-            doc.moveDown(1.5);
-
-            // Educational Information
-            doc.fontSize(14)
-               .font('Helvetica-Bold')
-               .text('EDUCATIONAL INFORMATION', 70, doc.y);
+            // Information fields with better spacing
+            const lineHeight = 25;
+            let currentY = doc.y;
             
-            doc.moveDown(0.5);
-            doc.fontSize(10)
-               .font('Helvetica')
-               .text(`Education: ${userData.education || 'N/A'}`, 70, doc.y)
-               .text(`Qualification: ${userData.qualification || 'N/A'}`, 70, doc.y + 15, {
-                   width: 450,
-                   lineGap: 5
-               })
-               .text(`Skills: ${userData.skills || 'N/A'}`, 70, doc.y + 15, {
-                   width: 450,
-                   lineGap: 5
-               });
+            doc.fontSize(12)
+               .font('Helvetica-Bold')
+               .text('Applicant Name:', 70, currentY);
+            doc.font('Helvetica')
+               .text(userData.applicant_name || 'N/A', 220, currentY);
+            
+            currentY += lineHeight;
+            doc.font('Helvetica-Bold')
+               .text('Father\'s Name:', 70, currentY);
+            doc.font('Helvetica')
+               .text(userData.father_name || 'N/A', 220, currentY);
+            
+            currentY += lineHeight;
+            doc.font('Helvetica-Bold')
+               .text('Contact No.:', 70, currentY);
+            doc.font('Helvetica')
+               .text(userData.mobile || 'N/A', 220, currentY);
+            
+            currentY += lineHeight;
+            doc.font('Helvetica-Bold')
+               .text('Roll Number:', 70, currentY);
+            doc.font('Helvetica')
+               .fontSize(14)
+               .text(rollNumber, 220, currentY);
+            
+            currentY += lineHeight;
+            doc.fontSize(12)
+               .font('Helvetica-Bold')
+               .text('Email:', 70, currentY);
+            doc.font('Helvetica')
+               .text(userData.email || 'N/A', 220, currentY);
+            
+            doc.y = currentY + lineHeight;
 
             doc.moveDown(2);
 
