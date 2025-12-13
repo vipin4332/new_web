@@ -838,18 +838,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }, 100);
     
-    // Test backend connection
+    // Test backend connection (silently, don't show errors)
     try {
         const response = await fetch(`${API_BASE_URL}/api/health`);
         if (response.ok) {
             console.log('✅ Backend server is running');
         } else {
-            console.warn('⚠️ Backend server might not be running');
-            showMessage('⚠️ Warning: Backend server might not be running. Please make sure the server is started.', 'error');
+            console.warn('⚠️ Backend server health check failed:', response.status);
         }
     } catch (error) {
-        console.error('❌ Cannot connect to backend server:', error);
-        showMessage('❌ Error: Cannot connect to backend server. Please make sure the server is running at http://localhost:5000', 'error');
+        console.warn('⚠️ Backend health check failed:', error.message);
+        // Don't show error message to user, just log it
     }
 });
 </script>
