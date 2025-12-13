@@ -449,10 +449,18 @@ async function sendOTP(email) {
             }
         } catch (apiError) {
             console.error('Backend API error:', apiError);
+            console.error('Error details:', {
+                message: apiError.message,
+                stack: apiError.stack,
+                name: apiError.name
+            });
+            
+            // Show more detailed error
+            otpError.textContent = `Failed to send OTP: ${apiError.message}. Check console for details.`;
             
             // Fallback: If backend is not available, show OTP in alert for testing
             console.warn('⚠️ Backend not available. Showing OTP in alert for testing.');
-            alert(`Backend server not available.\n\nFor testing, OTP is: ${otpGenerated}\n\nPlease make sure the backend server is running on ${API_BASE_URL}`);
+            alert(`Backend server error.\n\nError: ${apiError.message}\n\nFor testing, OTP is: ${otpGenerated}\n\nBackend URL: ${API_BASE_URL}/api/send-otp`);
         }
         
         // Show OTP section
