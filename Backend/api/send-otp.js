@@ -34,13 +34,39 @@ module.exports = async (req, res) => {
         console.log('📧 Request body:', req.body);
 
         // Parse request body
+        // Vercel automatically parses JSON bodies, but we need to handle edge cases
         let email;
         try {
+            if (!req.body) {
+                console.error('❌ Request body is missing');
+                return res.status(400).json({
+                    success: false,
+                    status: 'error',
+                    message: 'Request body is required'
+                });
+            }
+
             if (typeof req.body === 'string') {
-                const parsed = JSON.parse(req.body);
-                email = parsed.email;
+                try {
+                    const parsed = JSON.parse(req.body);
+                    email = parsed.email;
+                } catch (parseError) {
+                    console.error('❌ Error parsing JSON string:', parseError);
+                    return res.status(400).json({
+                        success: false,
+                        status: 'error',
+                        message: 'Invalid JSON in request body'
+                    });
+                }
+            } else if (typeof req.body === 'object') {
+                email = req.body.email;
             } else {
-                email = req.body?.email;
+                console.error('❌ Unexpected body type:', typeof req.body);
+                return res.status(400).json({
+                    success: false,
+                    status: 'error',
+                    message: 'Invalid request body format'
+                });
             }
         } catch (parseError) {
             console.error('❌ Error parsing request body:', parseError);

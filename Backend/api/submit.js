@@ -32,6 +32,12 @@ module.exports = async (req, res) => {
         // For now, we'll handle JSON or URL-encoded data
         let formData = req.body;
         
+        // Handle missing body
+        if (!formData) {
+            console.warn('⚠️ Request body is missing');
+            formData = {};
+        }
+        
         // If body is a string, try to parse it
         if (typeof formData === 'string') {
             try {
@@ -48,6 +54,7 @@ module.exports = async (req, res) => {
             console.log('📝 Multipart form data detected (file uploads may not be fully processed)');
             // For full file upload support, you would need to use formidable or multer
             // For now, we'll extract text fields if possible
+            // Vercel automatically parses multipart data, but file handling needs additional libraries
         }
 
         // Validate required fields

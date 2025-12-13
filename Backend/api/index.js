@@ -2,16 +2,15 @@
 // This handles requests to the root URL (/)
 module.exports = async (req, res) => {
     try {
-        // Set CORS headers
-        res.setHeader('Access-Control-Allow-Credentials', true);
+        // Set CORS headers first
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
         // Handle OPTIONS request (CORS preflight)
         if (req.method === 'OPTIONS') {
-            res.status(200).end();
-            return;
+            return res.status(200).end();
         }
 
         // Only allow GET requests for root
@@ -24,13 +23,14 @@ module.exports = async (req, res) => {
         }
 
         // Return friendly JSON response
-        res.status(200).json({ 
+        return res.status(200).json({ 
             status: 'backend running',
             version: '1.0'
         });
     } catch (error) {
         console.error('❌ Root route error:', error);
-        res.status(500).json({ 
+        console.error('❌ Error stack:', error.stack);
+        return res.status(500).json({ 
             status: 'error',
             message: 'Internal server error',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
