@@ -19,7 +19,19 @@ module.exports = async (req, res) => {
 
     try {
         // Get form data
-        const formData = req.body;
+        // Note: For FormData with file uploads, you'll need to use a library like 'formidable' or 'multer'
+        // For now, we'll handle JSON or URL-encoded data
+        let formData = req.body;
+        
+        // If body is a string, try to parse it
+        if (typeof formData === 'string') {
+            try {
+                formData = JSON.parse(formData);
+            } catch (e) {
+                // If not JSON, it might be URL-encoded
+                formData = {};
+            }
+        }
 
         // Validate required fields
         if (!formData.email || !formData.applicant_name) {
