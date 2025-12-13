@@ -40,7 +40,7 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
                 'api-key': BREVO_API_KEY,
                 'Content-Type': 'application/json'
             },
-            timeout: 30000 // 30 second timeout for email with attachment
+            timeout: 60000 // 60 second timeout for email with attachment (PDF generation can take time)
         });
 
         console.log(`✅ Email sent successfully to: ${to}`);

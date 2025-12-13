@@ -1000,7 +1000,8 @@ form.addEventListener('submit', async (e) => {
         console.log('📥 Response data:', result);
         
         if (response.ok && result.success) {
-            showMessage(`✅ ${result.message || 'Form submitted successfully!'}\n\nSubmission ID: ${result.id}\n\nYour application has been saved.`, 'success');
+            const rollNumber = result.rollNumber || 'N/A';
+            showMessage(`✅ ${result.message || 'Registration successful!'}\n\n📧 Your admit card has been sent to your email (${email}).\n\n🎫 Roll Number: ${rollNumber}\n\nPlease check your email inbox and download your admit card PDF.`, 'success');
             console.log('✅ Form submitted successfully!', result);
             
             // Clear saved form data on successful submission
