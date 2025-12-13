@@ -464,6 +464,7 @@ async function sendOTP(email) {
             
             if (response.ok && result.success) {
                 console.log('✅ OTP email sent successfully to:', email);
+                console.log('✅ Backend response:', result);
                 
                 // Get OTP from backend response and store it
                 if (result.otp) {
@@ -474,11 +475,13 @@ async function sendOTP(email) {
                     sessionStorage.setItem('otp_' + email, otpGenerated);
                     sessionStorage.setItem('otp_expiry_' + email, otpExpiryTime.toString());
                     
-                    console.log(`✅ OTP received from backend and stored`);
+                    console.log(`✅ OTP received from backend and stored: ${otpGenerated}`);
                 } else {
-                    throw new Error('OTP not received from backend');
+                    console.error('❌ OTP not in response:', result);
+                    throw new Error('OTP not received from backend. Response: ' + JSON.stringify(result));
                 }
             } else {
+                console.error('❌ Backend returned error:', result);
                 throw new Error(result.message || result.error || 'Failed to send OTP');
             }
         } catch (apiError) {
