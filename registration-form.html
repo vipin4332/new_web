@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <title>Tenx Registration Form</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- EmailJS SDK for sending emails -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
     body {
@@ -355,24 +353,12 @@
 
 <script>
 /*
- * EMAILJS SETUP INSTRUCTIONS:
+ * BACKEND API CONFIGURATION:
  * 
- * 1. Go to https://www.emailjs.com/ and create a free account (200 emails/month free)
- * 2. Create an Email Service (Gmail, Outlook, etc.)
- * 3. Create an Email Template with these variables:
- *    - {{to_email}} - recipient email
- *    - {{otp_code}} - the OTP code
- *    - {{subject}} - email subject
- *    - {{message}} - email message
- * 4. Get your Service ID, Template ID, and Public Key from EmailJS dashboard
- * 5. Replace the values below:
- *    - EMAILJS_SERVICE_ID
- *    - EMAILJS_TEMPLATE_ID
- *    - EMAILJS_PUBLIC_KEY
+ * This frontend calls the backend API to send OTP emails via Brevo.
+ * Make sure the backend server is running on the specified port.
  * 
- * Example Email Template:
- * Subject: {{subject}}
- * Body: Hello, Your OTP is: {{otp_code}} {{message}}
+ * For production, update API_BASE_URL to your deployed backend URL.
  */
 
 const API_BASE_URL = 'http://localhost:5000';
@@ -428,19 +414,7 @@ function startOTPTimer() {
     otpTimer.textContent = `OTP expires in: ${formatTime(timeLeft)}`;
 }
 
-// EmailJS Configuration
-// TODO: Replace these with your EmailJS credentials
-// Get them from: https://www.emailjs.com/
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // Replace with your EmailJS service ID
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // Replace with your EmailJS template ID
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY'; // Replace with your EmailJS public key
-
-// Initialize EmailJS (only if credentials are set)
-if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-}
-
-// Send OTP via Email using EmailJS
+// Send OTP via Email using Backend API (Brevo)
 async function sendOTP(email) {
     try {
         // Generate OTP
@@ -451,28 +425,34 @@ async function sendOTP(email) {
         sessionStorage.setItem('otp_' + email, otpGenerated);
         sessionStorage.setItem('otp_expiry_' + email, otpExpiryTime.toString());
         
-        // Check if EmailJS is configured
-        if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY' || EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID') {
-            // EmailJS not configured - show OTP in alert for testing
-            console.log(`OTP for ${email}: ${otpGenerated}`);
-            alert(`OTP sent to ${email}!\n\nOTP: ${otpGenerated}\n\nNote: Please configure EmailJS to send real emails. See instructions in code comments.`);
-        } else {
-            // Send email using EmailJS
-            try {
-                const templateParams = {
-                    to_email: email,
-                    otp_code: otpGenerated,
-                    subject: 'Your Tenx Registration OTP',
-                    message: `Your OTP for Tenx registration is: ${otpGenerated}\n\nThis OTP will expire in 5 minutes.\n\nIf you didn't request this OTP, please ignore this email.`
-                };
-                
-                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+        // Send OTP request to backend API
+        try {
+            const response = await fetch(`${API_BASE_URL}/send-otp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
                 console.log('✅ OTP email sent successfully to:', email);
-            } catch (emailError) {
-                console.error('EmailJS error:', emailError);
-                // Fallback: show OTP in alert if email fails
-                alert(`Failed to send email. OTP: ${otpGenerated}\n\nPlease check EmailJS configuration.`);
+                
+                // In development mode, backend might return OTP for testing
+                if (result.otp) {
+                    console.log(`Development mode - OTP: ${result.otp}`);
+                }
+            } else {
+                throw new Error(result.message || 'Failed to send OTP');
             }
+        } catch (apiError) {
+            console.error('Backend API error:', apiError);
+            
+            // Fallback: If backend is not available, show OTP in alert for testing
+            console.warn('⚠️ Backend not available. Showing OTP in alert for testing.');
+            alert(`Backend server not available.\n\nFor testing, OTP is: ${otpGenerated}\n\nPlease make sure the backend server is running on ${API_BASE_URL}`);
         }
         
         // Show OTP section

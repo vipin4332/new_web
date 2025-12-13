@@ -1,0 +1,153 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const brevo = require('@getbrevo/brevo');
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize Brevo API client
+let apiInstance = null;
+if (process.env.BREVO_API_KEY) {
+    apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+}
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        message: 'Server is running',
+        brevoConfigured: !!process.env.BREVO_API_KEY 
+    });
+});
+
+// Send OTP via Email using Brevo
+app.post('/send-otp', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Validate email
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid email address is required'
+            });
+        }
+
+        // Check if Brevo is configured
+        if (!process.env.BREVO_API_KEY || !apiInstance) {
+            return res.status(500).json({
+                success: false,
+                message: 'Email service is not configured. Please set BREVO_API_KEY in environment variables.'
+            });
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Email content
+        const emailData = {
+            sender: {
+                name: process.env.BREVO_SENDER_NAME || 'Tenx Registration',
+                email: process.env.BREVO_SENDER_EMAIL || 'noreply@tenx.com'
+            },
+            to: [{
+                email: email
+            }],
+            subject: 'Your Tenx Registration OTP',
+            htmlContent: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #007BFF, #0d46ff); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .otp-box { background: white; border: 2px dashed #007BFF; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+                        .otp-code { font-size: 32px; font-weight: bold; color: #007BFF; letter-spacing: 5px; }
+                        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Tenx Registration</h1>
+                        </div>
+                        <div class="content">
+                            <h2>Your OTP Verification Code</h2>
+                            <p>Hello,</p>
+                            <p>Thank you for registering with Tenx. Please use the following OTP to verify your email address:</p>
+                            
+                            <div class="otp-box">
+                                <div class="otp-code">${otp}</div>
+                            </div>
+                            
+                            <p><strong>This OTP will expire in 5 minutes.</strong></p>
+                            <p>If you didn't request this OTP, please ignore this email.</p>
+                            
+                            <div class="footer">
+                                <p>© 2025 Tenx. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+            textContent: `Your Tenx Registration OTP is: ${otp}\n\nThis OTP will expire in 5 minutes.\n\nIf you didn't request this OTP, please ignore this email.`
+        };
+
+        // Send email using Brevo
+        await apiInstance.sendTransacEmail(emailData);
+
+        console.log(`✅ OTP sent successfully to: ${email}`);
+
+        // Return success response (don't send OTP in response for security)
+        res.json({
+            success: true,
+            message: 'OTP sent successfully to your email',
+            // In production, don't send OTP in response
+            // For testing purposes, you can include it temporarily
+            otp: process.env.NODE_ENV === 'development' ? otp : undefined
+        });
+
+    } catch (error) {
+        console.error('❌ Error sending OTP:', error);
+        
+        // Handle Brevo API errors
+        if (error.response) {
+            return res.status(error.response.status || 500).json({
+                success: false,
+                message: error.response.body?.message || 'Failed to send OTP email',
+                error: process.env.NODE_ENV === 'development' ? error.response.body : undefined
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send OTP. Please try again later.',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    console.log(`📧 Brevo configured: ${!!process.env.BREVO_API_KEY}`);
+    
+    if (!process.env.BREVO_API_KEY) {
+        console.warn('⚠️  WARNING: BREVO_API_KEY is not set. OTP emails will not work.');
+        console.log('💡 Please create a .env file with your Brevo API key.');
+    }
+});
+
