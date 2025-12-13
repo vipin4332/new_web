@@ -883,8 +883,13 @@ form.addEventListener('submit', async (e) => {
             // Clear saved form data on successful submission
             clearFormData();
             
-            // Clear OTP verification
+            // Clear OTP verification and all OTP data
+            const currentEmail = emailInput.value.trim();
             sessionStorage.removeItem('verified_email');
+            if (currentEmail) {
+                sessionStorage.removeItem('otp_' + currentEmail);
+                sessionStorage.removeItem('otp_expiry_' + currentEmail);
+            }
             isOtpVerified = false;
             otpSection.classList.remove('active');
             otpInput.value = '';
