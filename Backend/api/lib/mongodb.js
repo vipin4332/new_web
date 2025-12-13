@@ -8,7 +8,10 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB = process.env.MONGODB_DB || 'tenx_registrations';
 
 if (!MONGODB_URI) {
-    throw new Error('Please define the MONGODB_URI environment variable inside Vercel');
+    console.error('❌ MONGODB_URI is not defined in environment variables');
+    console.error('📝 Please add MONGODB_URI to Vercel environment variables');
+    console.error('📝 Format: mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority');
+    throw new Error('MONGODB_URI environment variable is required. Please set it in Vercel dashboard.');
 }
 
 async function connectToDatabase() {
