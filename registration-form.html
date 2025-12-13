@@ -450,8 +450,17 @@ async function sendOTP(email) {
             console.log('📥 Response status:', response.status);
             console.log('📥 Response headers:', response.headers);
             
-            const result = await response.json();
-            console.log('📥 Response data:', result);
+            // Check if response is OK before parsing JSON
+            let result;
+            try {
+                const text = await response.text();
+                console.log('📥 Response text:', text);
+                result = JSON.parse(text);
+                console.log('📥 Response data:', result);
+            } catch (parseError) {
+                console.error('❌ Error parsing response:', parseError);
+                throw new Error(`Invalid response from server. Status: ${response.status}`);
+            }
             
             if (response.ok && result.success) {
                 console.log('✅ OTP email sent successfully to:', email);
