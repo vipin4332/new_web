@@ -1,0 +1,60 @@
+==========================================
+TENX REGISTRATION FORM - DEPLOYMENT CHECKLIST
+==========================================
+
+FRONTEND (GitHub Pages):
+✅ Already deployed at: https://vipin4332.github.io/new_web/
+✅ Files: index.html, registration-form.html
+
+BACKEND (Vercel):
+📍 Deploy URL: https://new-web-dusky.vercel.app
+
+STEP 1: VERIFY VERCEL ENVIRONMENT VARIABLES
+-------------------------------------------
+Go to: Vercel Dashboard → new-web-dusky → Settings → Environment Variables
+
+Required Variables:
+1. BREVO_API_KEY = [Your Brevo API Key - set in Vercel dashboard]
+2. BREVO_SENDER_EMAIL = vs9953682@gmail.com
+3. BREVO_SENDER_NAME = Tenx Registration (optional)
+
+⚠️ IMPORTANT: Set for ALL environments (Production, Preview, Development)
+
+STEP 2: VERCEL PROJECT SETTINGS
+--------------------------------
+1. Root Directory: Backend
+2. Framework Preset: Other
+3. Build Command: (leave empty)
+4. Output Directory: (leave empty)
+5. Install Command: npm install
+
+STEP 3: DEPLOY
+--------------
+1. Push code to GitHub (main branch)
+2. Vercel will auto-deploy
+3. Wait for deployment to complete
+
+STEP 4: TEST ENDPOINTS
+----------------------
+✅ Health Check: https://new-web-dusky.vercel.app/api/health
+✅ Send OTP: https://new-web-dusky.vercel.app/api/send-otp (POST)
+✅ Submit Form: https://new-web-dusky.vercel.app/api/submit (POST)
+
+STEP 5: TEST FRONTEND
+---------------------
+1. Go to: https://vipin4332.github.io/new_web/
+2. Click "Register Now"
+3. Enter email → Click "Send OTP"
+4. Check email for OTP
+5. Enter OTP → Verify
+6. Fill form → Submit
+
+TROUBLESHOOTING:
+----------------
+❌ 404 Error: Check Vercel root directory is set to "Backend"
+❌ Authentication Error: Verify BREVO_API_KEY is set correctly
+❌ Sender Email Error: Verify BREVO_SENDER_EMAIL is verified in Brevo dashboard
+❌ CORS Error: Check API endpoints have CORS headers (already configured)
+
+==========================================
+
