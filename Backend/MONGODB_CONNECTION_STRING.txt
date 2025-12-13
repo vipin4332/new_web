@@ -1,0 +1,37 @@
+MongoDB Connection String Template
+===================================
+
+Your Credentials:
+- Username: vs9953682@_db_user
+- Password: fYuMLJcGRCIVG54c
+
+STEP 1: Get your cluster URL from MongoDB Atlas
+------------------------------------------------
+1. Go to https://cloud.mongodb.com
+2. Click on your cluster
+3. Click "Connect" → "Connect your application"
+4. You'll see a connection string like:
+   mongodb+srv://<username>:<password>@cluster0.XXXXX.mongodb.net/...
+
+5. Copy the cluster part: cluster0.XXXXX.mongodb.net
+   (Replace XXXXX with your actual cluster identifier)
+
+STEP 2: Use this template (replace YOUR_CLUSTER_URL)
+----------------------------------------------------
+mongodb+srv://vs9953682@_db_user:fYuMLJcGRCIVG54c@YOUR_CLUSTER_URL.mongodb.net/?retryWrites=true&w=majority
+
+Example (if your cluster is cluster0.abc123.mongodb.net):
+mongodb+srv://vs9953682@_db_user:fYuMLJcGRCIVG54c@cluster0.abc123.mongodb.net/?retryWrites=true&w=majority
+
+STEP 3: Add to Vercel Environment Variables
+--------------------------------------------
+Variable Name: MONGODB_URI
+Variable Value: [Paste the connection string from Step 2]
+
+Variable Name: MONGODB_DB
+Variable Value: tenx_registrations
+
+STEP 4: Don't forget Network Access
+------------------------------------
+In MongoDB Atlas → Network Access → Add IP Address → Allow Access from Anywhere (0.0.0.0/0)
+
