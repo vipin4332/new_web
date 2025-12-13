@@ -854,20 +854,34 @@ form.addEventListener('submit', async (e) => {
     
     try {
         // Get form data
-        const formData = new FormData(form);
+        const formDataObj = new FormData(form);
+        
+        // Convert FormData to plain object (skip file inputs for now)
+        const formData = {};
+        for (let [key, value] of formDataObj.entries()) {
+            // Skip file inputs as they can't be sent as JSON
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && field.type !== 'file') {
+                formData[key] = value;
+            }
+        }
         
         // Log form data (for debugging)
-        console.log('📋 Form data:', Object.fromEntries(formData));
+        console.log('📋 Form data:', formData);
         
         // Validate email match
-        const email = formData.get('email');
+        const email = formData.email;
         
-        // Submit form
+        // Submit form as JSON
         console.log('📤 Submitting to:', `${API_BASE_URL}/api/submit`);
+        console.log('📤 Request body:', formData);
         
         const response = await fetch(`${API_BASE_URL}/api/submit`, {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
         });
         
         console.log('📥 Response status:', response.status);

@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         console.log('📝 Content-Type:', req.headers['content-type']);
 
         // Parse form data
-        // Vercel automatically parses FormData, but we need to handle it properly
+        // Frontend sends JSON, so parse it
         let formData = req.body || {};
         
         // If body is a string, try to parse it
@@ -42,10 +42,14 @@ module.exports = async (req, res) => {
                 formData = JSON.parse(formData);
                 console.log('📝 Parsed JSON body');
             } catch (e) {
-                console.warn('⚠️ Failed to parse JSON body');
+                console.warn('⚠️ Failed to parse JSON body:', e.message);
                 formData = {};
             }
         }
+        
+        // Log received data for debugging
+        console.log('📝 Received form data:', formData);
+        console.log('📝 Form data keys:', Object.keys(formData));
 
         // Validate required fields
         const requiredFields = [
