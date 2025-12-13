@@ -493,6 +493,7 @@ async function sendOTP(email) {
         otpInput.disabled = false;
         otpInput.focus();
         otpError.textContent = '';
+        otpError.style.color = '';
         otpSuccess.style.display = 'none';
         isOtpVerified = false;
         verifyOtpBtn.disabled = false;
@@ -505,18 +506,25 @@ async function sendOTP(email) {
         updateFormSubmissionState();
         
         // Show success message
-        otpError.textContent = '';
         otpError.style.color = 'green';
         otpError.textContent = '✅ OTP sent successfully! Check your email.';
         setTimeout(() => {
             otpError.textContent = '';
             otpError.style.color = '';
-        }, 3000);
+        }, 5000);
         
         return true;
     } catch (error) {
         console.error('Error sending OTP:', error);
-        otpError.textContent = 'Failed to send OTP. Please try again.';
+        otpError.style.color = 'red';
+        otpError.textContent = `Failed to send OTP: ${error.message || 'Please try again.'}`;
+        
+        // Re-enable buttons
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.textContent = 'Send OTP to Email';
+        resendOtpBtn.disabled = false;
+        resendOtpBtn.textContent = 'Resend OTP';
+        
         return false;
     }
 }
@@ -622,30 +630,60 @@ emailInput.addEventListener('input', function() {
 });
 
 // Send OTP button click
-sendOtpBtn.addEventListener('click', function() {
+sendOtpBtn.addEventListener('click', async function() {
     const email = emailInput.value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && emailRegex.test(email)) {
         sendOtpBtn.disabled = true;
         sendOtpBtn.textContent = 'Sending...';
-        sendOTP(email).then(() => {
+        otpError.textContent = '';
+        otpError.style.color = '';
+        
+        try {
+            const success = await sendOTP(email);
+            if (!success) {
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.textContent = 'Send OTP to Email';
+            }
+        } catch (error) {
+            console.error('Error in sendOTP:', error);
+            otpError.textContent = 'Failed to send OTP. Please try again.';
+            otpError.style.color = 'red';
             sendOtpBtn.disabled = false;
             sendOtpBtn.textContent = 'Send OTP to Email';
-        });
+        }
+    } else {
+        otpError.textContent = 'Please enter a valid email address.';
+        otpError.style.color = 'red';
     }
 });
 
 // Resend OTP button click
-resendOtpBtn.addEventListener('click', function() {
+resendOtpBtn.addEventListener('click', async function() {
     const email = emailInput.value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && emailRegex.test(email)) {
         resendOtpBtn.disabled = true;
         resendOtpBtn.textContent = 'Resending...';
-        sendOTP(email).then(() => {
+        otpError.textContent = '';
+        otpError.style.color = '';
+        
+        try {
+            const success = await sendOTP(email);
+            if (!success) {
+                resendOtpBtn.disabled = false;
+                resendOtpBtn.textContent = 'Resend OTP';
+            }
+        } catch (error) {
+            console.error('Error in sendOTP:', error);
+            otpError.textContent = 'Failed to resend OTP. Please try again.';
+            otpError.style.color = 'red';
             resendOtpBtn.disabled = false;
             resendOtpBtn.textContent = 'Resend OTP';
-        });
+        }
+    } else {
+        otpError.textContent = 'Please enter a valid email address.';
+        otpError.style.color = 'red';
     }
 });
 
