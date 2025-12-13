@@ -739,9 +739,9 @@ form.addEventListener('submit', async (e) => {
         }
         
         // Submit form
-        console.log('📤 Submitting to:', `${API_BASE_URL}/submit`);
+        console.log('📤 Submitting to:', `${API_BASE_URL}/api/submit`);
         
-        const response = await fetch(`${API_BASE_URL}/submit`, {
+        const response = await fetch(`${API_BASE_URL}/api/submit`, {
             method: 'POST',
             body: formData
         });
@@ -825,7 +825,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Test backend connection
     try {
-        const response = await fetch(`${API_BASE_URL}/health`);
+        const response = await fetch(`${API_BASE_URL}/api/health`);
         if (response.ok) {
             console.log('✅ Backend server is running');
         } else {
