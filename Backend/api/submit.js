@@ -143,6 +143,13 @@ module.exports = async (req, res) => {
         console.log('📄 Generating admit card PDF...');
         const pdfBuffer = await generateAdmitCardPDF(registrationData, rollNumber);
         console.log('✅ PDF generated:', (pdfBuffer.length / 1024).toFixed(2), 'KB');
+        console.log('✅ PDF buffer type:', typeof pdfBuffer, 'isBuffer:', Buffer.isBuffer(pdfBuffer));
+        console.log('✅ PDF buffer length:', pdfBuffer.length, 'bytes');
+        
+        // Validate PDF buffer
+        if (!pdfBuffer || !Buffer.isBuffer(pdfBuffer) || pdfBuffer.length === 0) {
+            throw new Error('Failed to generate PDF: Invalid or empty PDF buffer');
+        }
 
         // Upload PDF to Vercel Blob Storage
         let pdfUrl = null;

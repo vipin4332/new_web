@@ -12,9 +12,24 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
     }
 
     try {
-        // Convert PDF buffer to base64
-        const pdfBase64 = pdfBuffer.toString('base64');
+        // Validate PDF buffer
+        if (!pdfBuffer || !Buffer.isBuffer(pdfBuffer)) {
+            throw new Error('Invalid PDF buffer provided');
+        }
 
+        if (pdfBuffer.length === 0) {
+            throw new Error('PDF buffer is empty');
+        }
+
+        console.log(`📧 Preparing email with attachment to: ${to}`);
+        console.log(`📎 Attachment: ${fileName} (${(pdfBuffer.length / 1024).toFixed(2)} KB)`);
+        console.log(`📎 PDF buffer type: ${typeof pdfBuffer}, isBuffer: ${Buffer.isBuffer(pdfBuffer)}`);
+
+        // Convert PDF buffer to base64 (Brevo requires base64 encoded attachments)
+        const pdfBase64 = pdfBuffer.toString('base64');
+        console.log(`📎 Base64 length: ${pdfBase64.length} characters`);
+
+        // Brevo API format for attachments
         const emailData = {
             sender: {
                 name: SENDER_NAME,
@@ -32,24 +47,36 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
             }]
         };
 
-        console.log(`📧 Sending email with attachment to: ${to}`);
-        console.log(`📎 Attachment: ${fileName} (${(pdfBuffer.length / 1024).toFixed(2)} KB)`);
+        console.log(`📤 Sending email via Brevo API...`);
+        console.log(`📤 Email data keys:`, Object.keys(emailData));
+        console.log(`📤 Attachment present:`, emailData.attachments ? 'Yes' : 'No');
+        console.log(`📤 Attachment name:`, emailData.attachments[0]?.name);
+        console.log(`📤 Attachment content length:`, emailData.attachments[0]?.content?.length || 0);
 
         const response = await axios.post(BREVO_API_URL, emailData, {
             headers: {
                 'api-key': BREVO_API_KEY,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             timeout: 60000 // 60 second timeout for email with attachment (PDF generation can take time)
         });
 
         console.log(`✅ Email sent successfully to: ${to}`);
+        console.log(`✅ Brevo response status:`, response.status);
+        console.log(`✅ Brevo response data:`, JSON.stringify(response.data));
+
         return response.data;
     } catch (error) {
-        console.error('❌ Error sending email:', error);
+        console.error('❌ Error sending email with attachment:', error);
         if (error.response) {
-            console.error('❌ Brevo API Error:', error.response.data);
-            throw new Error(error.response.data?.message || 'Failed to send email');
+            console.error('❌ Brevo API Error Status:', error.response.status);
+            console.error('❌ Brevo API Error Data:', JSON.stringify(error.response.data, null, 2));
+            throw new Error(`Brevo API error: ${error.response.data?.message || JSON.stringify(error.response.data) || 'Unknown error'}`);
+        }
+        if (error.request) {
+            console.error('❌ No response received from Brevo API');
+            throw new Error('No response from Brevo API. Please check your network connection.');
         }
         throw error;
     }
