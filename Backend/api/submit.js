@@ -151,6 +151,10 @@ module.exports = async (req, res) => {
             throw new Error('Failed to generate PDF: Invalid or empty PDF buffer');
         }
 
+        // Ensure PDF buffer is a proper Buffer (same pattern as fs.readFileSync)
+        // The buffer from pdfkit is already a Buffer, but we ensure it's ready for base64 conversion
+        console.log('✅ PDF buffer validated and ready for base64 conversion');
+
         // Upload PDF to Vercel Blob Storage
         let pdfUrl = null;
         try {

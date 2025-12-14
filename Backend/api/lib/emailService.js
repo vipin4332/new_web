@@ -26,8 +26,11 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
         console.log(`📎 PDF buffer type: ${typeof pdfBuffer}, isBuffer: ${Buffer.isBuffer(pdfBuffer)}`);
 
         // Convert PDF buffer to base64 (Brevo requires base64 encoded attachments)
-        const pdfBase64 = pdfBuffer.toString('base64');
+        // Using the same pattern as: pdfBuffer.toString("base64")
+        const pdfBase64 = pdfBuffer.toString("base64");
+        console.log(`📎 Base64 conversion successful`);
         console.log(`📎 Base64 length: ${pdfBase64.length} characters`);
+        console.log(`📎 Base64 preview (first 50 chars): ${pdfBase64.substring(0, 50)}...`);
 
         // Brevo API format for attachments
         const emailData = {
