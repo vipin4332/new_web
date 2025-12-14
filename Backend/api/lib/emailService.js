@@ -28,7 +28,8 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
         }
 
         console.log(`📧 Preparing email with attachment to: ${to}`);
-        console.log(`📎 Attachment: ${fileName} (${(pdfBuffer.length / 1024).toFixed(2)} KB)`);
+        console.log(`📎 Attachment filename: ${fileName}`);
+        console.log(`📎 PDF buffer size: ${(pdfBuffer.length / 1024).toFixed(2)} KB`);
         console.log(`📎 PDF buffer type: ${typeof pdfBuffer}, isBuffer: ${Buffer.isBuffer(pdfBuffer)}`);
 
         // Convert PDF buffer to base64 (Brevo requires base64 encoded attachments)
@@ -37,10 +38,10 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
         // ✅ All operations are async (non-blocking)
         const pdfBase64 = pdfBuffer.toString("base64");
         console.log(`📎 Base64 conversion successful`);
-        console.log(`📎 Base64 length: ${pdfBase64.length} characters`);
+        console.log(`📎 Base64 string length: ${pdfBase64.length} characters`);
         console.log(`📎 Base64 preview (first 50 chars): ${pdfBase64.substring(0, 50)}...`);
 
-        // Brevo API format for attachments
+        // Brevo API format for attachments - CRITICAL: Use "attachment" (singular), not "attachments" (plural)
         const emailData = {
             sender: {
                 name: SENDER_NAME,
@@ -52,17 +53,21 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
             subject: subject,
             htmlContent: htmlContent,
             textContent: htmlContent.replace(/<[^>]*>/g, ''), // Strip HTML for text version
-            attachments: [{
+            attachment: [{
                 name: fileName,
                 content: pdfBase64
             }]
         };
 
+        // Log BEFORE sending to Brevo API
         console.log(`📤 Sending email via Brevo API...`);
         console.log(`📤 Email data keys:`, Object.keys(emailData));
-        console.log(`📤 Attachment present:`, emailData.attachments ? 'Yes' : 'No');
-        console.log(`📤 Attachment name:`, emailData.attachments[0]?.name);
-        console.log(`📤 Attachment content length:`, emailData.attachments[0]?.content?.length || 0);
+        console.log(`📤 Attachment property present:`, emailData.attachment ? 'Yes' : 'No');
+        console.log(`📤 Attachment array length:`, emailData.attachment?.length || 0);
+        console.log(`📤 Attachment name:`, emailData.attachment?.[0]?.name || 'N/A');
+        console.log(`📤 Attachment content type:`, typeof emailData.attachment?.[0]?.content);
+        console.log(`📤 Attachment content length:`, emailData.attachment?.[0]?.content?.length || 0);
+        console.log(`📤 Attachment content preview:`, emailData.attachment?.[0]?.content?.substring(0, 50) || 'N/A');
 
         const response = await axios.post(BREVO_API_URL, emailData, {
             headers: {
@@ -75,6 +80,8 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
 
         console.log(`✅ Email sent successfully to: ${to}`);
         console.log(`✅ Brevo response status:`, response.status);
+        console.log(`✅ Brevo response statusText:`, response.statusText);
+        console.log(`✅ Brevo messageId:`, response.data?.messageId || 'N/A');
         console.log(`✅ Brevo response data:`, JSON.stringify(response.data));
 
         return response.data;
@@ -82,6 +89,7 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
         console.error('❌ Error sending email with attachment:', error);
         if (error.response) {
             console.error('❌ Brevo API Error Status:', error.response.status);
+            console.error('❌ Brevo API Error StatusText:', error.response.statusText);
             console.error('❌ Brevo API Error Data:', JSON.stringify(error.response.data, null, 2));
             throw new Error(`Brevo API error: ${error.response.data?.message || JSON.stringify(error.response.data) || 'Unknown error'}`);
         }
