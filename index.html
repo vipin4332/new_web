@@ -541,7 +541,7 @@
         <h1>Join the <span style="background:linear-gradient(135deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent">top 1%</span> with world-class mentors & a job-ready curriculum.</h1>
         <p class="sub">Tenx students consistently secure elite ranks in GATE & tech placements. Learn with a portfolio-first approach, interview prep, and a powerful alumni network.</p>
         <div class="hero-cta">
-         <a class="btn btn-primary" href="registration-form.html">Register Now</a>
+         <button class="btn btn-primary" onclick="openFormWindow()">Register Now</button>
 
           <a class="btn btn-primary" href="#courses">Explore Programs</a>
           <a class="btn btn-ghost" href="#pricing">View Fee Plans</a>
@@ -1149,7 +1149,7 @@
             const register = confirm(`You need to register/login to subscribe to the ${planDisplayName} plan (₹${parseInt(planPrice).toLocaleString('en-IN')}/month).\n\nWould you like to register now?`);
             if (register) {
               // Open registration form
-              window.location.href = "registration-form.html";
+              openFormWindow();
             }
             return;
           }
@@ -1337,5 +1337,10 @@
       console.log('💡 If you see "No data found", run "npm run seed" in the backend directory');
     });
   </script>
+  <script>
+function openFormWindow() {
+  window.location.href = "registration-form.html";
+}
+</script>
 </body>
 </html>
