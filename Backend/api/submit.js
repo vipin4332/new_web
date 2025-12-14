@@ -151,9 +151,14 @@ module.exports = async (req, res) => {
             throw new Error('Failed to generate PDF: Invalid or empty PDF buffer');
         }
 
-        // Ensure PDF buffer is a proper Buffer (same pattern as fs.readFileSync)
-        // The buffer from pdfkit is already a Buffer, but we ensure it's ready for base64 conversion
+        // Validate PDF size (Brevo limit is typically 4MB, we'll use 3.5MB as safe limit)
+        const maxPdfSize = 3.5 * 1024 * 1024; // 3.5 MB in bytes
+        if (pdfBuffer.length > maxPdfSize) {
+            throw new Error(`PDF is too large: ${(pdfBuffer.length / 1024 / 1024).toFixed(2)} MB. Maximum allowed: 3.5 MB`);
+        }
+
         console.log('✅ PDF buffer validated and ready for base64 conversion');
+        console.log(`✅ PDF size: ${(pdfBuffer.length / 1024).toFixed(2)} KB (within limits)`);
 
         // Upload PDF to Vercel Blob Storage
         let pdfUrl = null;

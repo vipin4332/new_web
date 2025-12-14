@@ -21,12 +21,20 @@ async function sendEmailWithAttachment(to, subject, htmlContent, pdfBuffer, file
             throw new Error('PDF buffer is empty');
         }
 
+        // Validate PDF size (Brevo limit is typically 4MB, we'll use 3.5MB as safe limit)
+        const maxPdfSize = 3.5 * 1024 * 1024; // 3.5 MB in bytes
+        if (pdfBuffer.length > maxPdfSize) {
+            throw new Error(`PDF attachment is too large: ${(pdfBuffer.length / 1024 / 1024).toFixed(2)} MB. Maximum allowed: 3.5 MB`);
+        }
+
         console.log(`📧 Preparing email with attachment to: ${to}`);
         console.log(`📎 Attachment: ${fileName} (${(pdfBuffer.length / 1024).toFixed(2)} KB)`);
         console.log(`📎 PDF buffer type: ${typeof pdfBuffer}, isBuffer: ${Buffer.isBuffer(pdfBuffer)}`);
 
         // Convert PDF buffer to base64 (Brevo requires base64 encoded attachments)
-        // Using the same pattern as: pdfBuffer.toString("base64")
+        // ✅ Using in-memory buffer (no file system access)
+        // ✅ Converting to base64 string (not sending raw Buffer)
+        // ✅ All operations are async (non-blocking)
         const pdfBase64 = pdfBuffer.toString("base64");
         console.log(`📎 Base64 conversion successful`);
         console.log(`📎 Base64 length: ${pdfBase64.length} characters`);
